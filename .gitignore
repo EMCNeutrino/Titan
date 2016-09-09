@@ -24,3 +24,5 @@ _testmain.go
 *.test
 *.prof
 Titan.iml
+.idea/workspace.xml
+.idea/compiler.xml

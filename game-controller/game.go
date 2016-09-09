@@ -6,7 +6,6 @@ import (
 	"log"
 	"sync"
 	"time"
-	"debug/dwarf"
 )
 
 const (
