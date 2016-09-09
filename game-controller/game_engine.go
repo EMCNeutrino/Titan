@@ -14,13 +14,13 @@ const (
 )
 
 func (game *GameInfo) runEngine(wg *sync.WaitGroup) {
-	wg.Add(len(game.Teams))
-	for i := range game.Teams {
-		go game.handleTeam(&game.Teams[i], wg)
+	wg.Add(len(game.Heros))
+	for i := range game.Heros {
+		go game.handleTeam(&game.Heros[i], wg)
 	}
 }
 
-func (game *GameInfo) handleTeam(team *Team, wg *sync.WaitGroup) {
+func (game *GameInfo) handleTeam(team *Hero, wg *sync.WaitGroup) {
 	var temperatureRatio float64
 	var radiationRatio float64
 	var energyGain float64

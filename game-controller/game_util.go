@@ -22,7 +22,7 @@ func (reading *Reading) validate() (bool, string) {
 }
 
 func (game *GameInfo) teamExists(name string) bool {
-	for _, v := range game.Teams {
+	for _, v := range game.Heros {
 		if v.Name == name {
 			return true
 		}
@@ -31,7 +31,7 @@ func (game *GameInfo) teamExists(name string) bool {
 }
 
 func (game *GameInfo) getTeamIndex(name string) (int, bool) {
-	for i, v := range game.Teams {
+	for i, v := range game.Heros {
 		if v.Name == name {
 			return i, true
 		}
@@ -40,7 +40,7 @@ func (game *GameInfo) getTeamIndex(name string) (int, bool) {
 }
 
 func (game *GameInfo) authorizeTeam(token string) (int, bool) {
-	for i, v := range game.Teams {
+	for i, v := range game.Heros {
 		if v.token == token {
 			return i, true
 		}
@@ -54,7 +54,7 @@ func (game *GameInfo) authorizeAdmin(token string) bool {
 
 func (game *GameInfo) isOver() bool {
 	remainingTeams := 0
-	for _, v := range game.Teams {
+	for _, v := range game.Heros {
 		if v.Life > 0 {
 			remainingTeams++
 		}

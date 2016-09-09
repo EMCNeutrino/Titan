@@ -6,6 +6,7 @@ import (
 	"log"
 	"sync"
 	"time"
+	"debug/dwarf"
 )
 
 const (
@@ -27,7 +28,7 @@ type GameInfo struct {
 	StartedAt    time.Time `json:"startedAt"`
 	Timestamp    time.Time `json:"timestamp"`
 	Reading      Reading   `json:"readings"`
-	Teams        []Team    `json:"teams"`
+	Heros        []Hero    `json:"teams"`
 	adminToken   string
 	autoReadings bool
 	start        chan TokenRequest
@@ -38,15 +39,6 @@ type GameInfo struct {
 	readings     chan ReadingsRequest
 	exit         chan []byte
 	shield       chan ShieldRequest
-}
-
-// Team contains information about a team
-type Team struct {
-	Name   string `json:"name"`
-	token  string
-	Energy int64 `json:"energy"`
-	Life   int64 `json:"life"`
-	Shield bool  `json:"shield"`
 }
 
 var game = GameInfo{
@@ -61,7 +53,7 @@ var game = GameInfo{
 	readings:     make(chan ReadingsRequest),
 	exit:         make(chan []byte),
 	Reading:      Reading{SolarFlare: initialSolarFlare, Temperature: initialTemperature, Radiation: initialRadiation},
-	Teams:        []Team{},
+	Heros:        []Hero{},
 }
 
 func (game *GameInfo) run(adminToken string) {
@@ -156,7 +148,7 @@ func (game *GameInfo) startGame(token string) (bool, string) {
 		return false, "Game is already started, not doing anything"
 	}
 
-	if len(game.Teams) < 2 {
+	if len(game.Heros) < 2 {
 		log.Println("At least 2 players are needed to start the game")
 		return false, "At least 2 players are needed to start the game"
 	}
@@ -178,7 +170,7 @@ func (game *GameInfo) resetGame(token string) (bool, string) {
 		return false, "Cannot reset game while it is running"
 	}
 
-	game.Teams = []Team{}
+	game.Heros = []Hero{}
 	game.Reading.Temperature = initialTemperature
 	game.Reading.Radiation = initialRadiation
 	game.Reading.SolarFlare = initialSolarFlare
@@ -197,8 +189,8 @@ func (game *GameInfo) joinGame(name string) (bool, string) {
 		log.Println(message)
 		return false, message
 	}
-	team := Team{Name: name, Life: initialLife, Energy: initialEnergy, Shield: false, token: randToken()}
-	game.Teams = append(game.Teams, team)
+	team := Hero{Name: name, Life: initialLife, Energy: initialEnergy, Shield: false, token: randToken()}
+	game.Heros = append(game.Heros, team)
 	log.Printf("Team '%s' joined the game", name)
 	return true, team.token
 }
@@ -218,7 +210,7 @@ func (game *GameInfo) kickTeam(token, name string) (bool, string) {
 		return false, message
 	}
 
-	game.Teams = append(game.Teams[:i], game.Teams[i+1:]...)
+	game.Heros = append(game.Heros[:i], game.Heros[i+1:]...)
 	message = fmt.Sprintf("Team '%s' left the game", name)
 	log.Println(message)
 	return true, message
@@ -231,8 +223,8 @@ func (game *GameInfo) enableShield(token string, enable bool) (bool, string) {
 		return false, "Unauthorized"
 	}
 
-	game.Teams[i].Shield = enable
-	message := fmt.Sprintf("Team '%s' set shield to %t", game.Teams[i].Name, game.Teams[i].Shield)
+	game.Heros[i].Shield = enable
+	message := fmt.Sprintf("Team '%s' set shield to %t", game.Heros[i].Name, game.Heros[i].Shield)
 	log.Println(message)
 	return true, message
 }
