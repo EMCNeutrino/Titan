@@ -5,28 +5,30 @@
 # you can try: pip remove six; pip install six
 # Windows users: you may need to install the Microsoft Visual C++ Compiler for Python 2.7
 # Windows users. please use this link: http://aka.ms/vcpython27
-import requests
-import websocket
 import json
 
+import requests
+import websocket
+from websocket import create_connection
 
 # Global Variables
-team_name = 'TheShields'                        # The Name of the Team
-team_auth = ''                                  # The Team Authentication Tocken
-server_url = 'http://192.168.59.103:8080/api'   # URL of the SERVER API
-server_ws = 'ws://192.168.59.103:8080/ws'       # URL of the Sensors Websocket
+hero_name = 'Gandalf'                       # Hero's name
+hero_title= 'The Grey'                      # Hero's title
+hero_auth = ''                              # The Hero Authentication Token
+server_url = 'http://localhost:8080/api'    # URL of the Game Controller API
+server_ws = 'ws://localhost:8080/ws'        # URL of the Game Controller Websocket
 
 
 # Server Method Calls ------------------------------------------------
 
-def register_team(team_name):
+def register_hero(hero_name):
     """
     Registers the Team in the Server
-    :param team_name:The team name
-    :return:The Team authentication Token
+    :param hero_name:The Hero's name
+    :return:The Hero authentication Token
     """
 
-    url = server_url + "/join/" + team_name
+    url = server_url + "/join/" + hero_name
     print('Server API URL: ' + url)
     payload = ''
 
@@ -34,23 +36,41 @@ def register_team(team_name):
     response = requests.post(url, data=payload)
 
     team_auth = response.text
-    # print ('Team Authentication Code:' + team_auth )
+    # print ('Hero Authentication Code:' + team_auth )
 
     if response.status_code == 200:
-        print ('Team \'' + team_name + '\' joined the game!')
-        print (team_name + ' authentication Code: ' + team_auth)
+        print ('Hero: \'' + hero_name + '\' joined the game!')
+        print (hero_name + ' authentication Code: ' + team_auth)
     else:
-        print ('Team \'' + team_name + '\' joining game Failed!')
+        print ('Hero: \'' + hero_name + '\' joining game Failed!')
         print ("HTTP Code: " + str(response.status_code) + " | Response: " + response.text)
 
     return team_auth
 
 
-# Shield Method Calls ------------------------------------------------
-def team_shield_up(team_name, team_auth):
+# Hero Method Calls ------------------------------------------------
+def hero_quest_request(hero_name, hero_auth):
     """
     Sets the team shield up
-    curl -i -H 'X-Auth-Token: 1335aa6af5d0289f' -X POST http://localhost:8080/api/shield/enable
+    curl -i -H 'X-Auth-Token: 1335aa6af5d0289f' -X POST http://localhost:8080/api/Quest/enable
+    :param hero_name:The team name
+    :param hero_auth:The team authentication token
+    :return: nothing
+    """
+    url = server_url + '/shield/enable'
+    auth_header = {'X-Auth-Token': hero_auth}
+    quest_request = requests.post(url, headers=auth_header)
+    if quest_request.status_code == 200:
+        print ('Server: Team: ' + hero_name + ' Shield is UP!')
+    else:
+        print ('Server: Team: ' + hero_name + ' Quest Reuquest! request Failed!')
+        print ("HTTP Code: " + str(quest_request.status_code) + " | Response: " + quest_request.text)
+
+
+def hero_battle_request(team_name, team_auth):
+    """
+    Sets the team shield up
+    curl -i -H 'X-Auth-Token: 1335aa6af5d0289f' -X POST http://localhost:8080/api/Quest/enable
     :param team_name:The team name
     :param team_auth:The team authentication token
     :return: nothing
@@ -65,7 +85,8 @@ def team_shield_up(team_name, team_auth):
         print ("HTTP Code: " + str(shield_up.status_code) + " | Response: " + shield_up.text)
 
 
-def team_shield_down(team_name, team_auth):
+
+def hero_shield_down(team_name, team_auth):
     """
     Sets the team shield Down
     curl -i -H 'X-Auth-Token: 1335aa6af5d0289f' -X POST http://localhost:8080/api/shield/disable
@@ -94,7 +115,7 @@ def data_recording(parsed_json):
     print("\nData Recording: Saving Data row for persistence. Time: " + str(parsed_json['startedAt']))
 
 
-def team_strategy(parsed_json):
+def hero_strategy(parsed_json):
     """
   Contains the Team's strategy.
   :param parsed_json: Readings from the Mars Sensors
@@ -108,18 +129,18 @@ def team_strategy(parsed_json):
 
     # Find this team
     for team in teams_list:
-        if team['name'] == team_name:
+        if team['name'] == hero_name:
             if team['shield'] <> True and team['energy'] > 10:
                 # Check if Shield is up and shield energy is larger than 10%
-                print("\nGameMove: Team: {0} Action: Shield UP!| Energy: {1}".format(team_name, str(team['energy'])))
-                team_shield_up(team_name, team_auth)
+                print("\nGameMove: Hero: {0} Action: Shield UP!| Energy: {1}".format(hero_name, str(team['energy'])))
+                hero_quest_request(hero_name, hero_auth)
             else:
-               print("\nTeam: {0} Action: None| Energy: {1}".format(team_name, str(team['energy'])))
+               print("\nHero: {0} Action: None| Energy: {1}".format(hero_name, str(team['energy'])))
 
 
 # Register the Team
 
-team_auth = register_team(team_name)
+hero_auth = register_hero(hero_name)
 
 
 # Create the WebSocket for Listening
@@ -143,7 +164,7 @@ while True:
         print('Waiting for the Game Start')
     else:
         data_recording(parsed_json)
-        team_strategy(parsed_json)
+        hero_strategy(parsed_json)
 
 ws.close()
 
