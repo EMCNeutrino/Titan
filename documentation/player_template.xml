@@ -1,0 +1,38 @@
+<player>
+    <username>Thorwald</username>
+    <isadmin>0</isadmin>
+    <level>20</level>
+    <class>Thief of Sorts</class>
+    <ttl>8206</ttl>
+    <userhost>
+        CodePagoda!~CodePagod@50-243-110-121-static.hfc.comcastbusiness.net
+    </userhost>
+    <online>1</online>
+    <totalidled>73268</totalidled>
+    <xpos>456</xpos>
+    <ypos>210</ypos>
+    <alignment>e</alignment>
+    <penalties>
+        <logout>0</logout>
+        <quest>0</quest>
+        <quit>395</quit>
+        <kick>0</kick>
+        <part>0</part>
+        <nick>0</nick>
+        <mesg>0</mesg>
+        <total>395</total>
+    </penalties>
+    <items>
+        <weapon>13</weapon>
+        <tunic>23</tunic>
+        <shield>28</shield>
+        <leggings>11</leggings>
+        <ring>14</ring>
+        <gloves>7</gloves>
+        <boots>16</boots>
+        <helm>19</helm>
+        <charm>17</charm>
+        <amulet>0</amulet>
+        <total>148</total>
+    </items>
+</player>
