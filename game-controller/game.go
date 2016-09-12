@@ -179,19 +179,19 @@ func (game *GameInfo) resetGame(token string) (bool, string) {
 
 func (game *GameInfo) joinGame(name string) (bool, string) {
 	if game.Running {
-		message := fmt.Sprintf("Team '%s' cannot join the game because it's already running", name)
+		message := fmt.Sprintf("Hero: '%s' cannot join the game because it's already running", name)
 		log.Println(message)
 		return false, message
 	}
 	if game.teamExists(name) {
-		message := fmt.Sprintf("Team '%s' already exists.", name)
+		message := fmt.Sprintf("Hero: '%s' already exists.", name)
 		log.Println(message)
 		return false, message
 	}
-	team := Hero{Name: name, Life: initialLife, Energy: initialEnergy, Shield: false, token: randToken()}
-	game.Heros = append(game.Heros, team)
-	log.Printf("Team '%s' joined the game", name)
-	return true, team.token
+	hero := Hero{Name: name, Life: initialLife, Energy: initialEnergy, Shield: false, token: randToken()}
+	game.Heros = append(game.Heros, hero)
+	log.Printf("Hero: '%s' joined the game", name)
+	return true, hero.token
 }
 
 func (game *GameInfo) kickTeam(token, name string) (bool, string) {
@@ -204,13 +204,13 @@ func (game *GameInfo) kickTeam(token, name string) (bool, string) {
 
 	i, ok := game.getTeamIndex(name)
 	if !ok {
-		message = fmt.Sprintf("Team '%s' does not exist", name)
+		message = fmt.Sprintf("Hero: '%s' does not exist", name)
 		log.Println(message)
 		return false, message
 	}
 
 	game.Heros = append(game.Heros[:i], game.Heros[i+1:]...)
-	message = fmt.Sprintf("Team '%s' left the game", name)
+	message = fmt.Sprintf("Hero: '%s' left the game", name)
 	log.Println(message)
 	return true, message
 }

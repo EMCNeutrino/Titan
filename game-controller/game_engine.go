@@ -16,42 +16,42 @@ const (
 func (game *GameInfo) runEngine(wg *sync.WaitGroup) {
 	wg.Add(len(game.Heros))
 	for i := range game.Heros {
-		go game.handleTeam(&game.Heros[i], wg)
+		go game.handleHero(&game.Heros[i], wg)
 	}
 }
 
-func (game *GameInfo) handleTeam(team *Hero, wg *sync.WaitGroup) {
+func (game *GameInfo) handleHero(hero *Hero, wg *sync.WaitGroup) {
 	var temperatureRatio float64
 	var radiationRatio float64
 	var energyGain float64
 	var energyLoss float64
 	var lifeLoss float64
 
-	for team.Life > 0 && game.Running {
+	for hero.Life > 0 && game.Running {
 		time.Sleep(1 * time.Second)
 		radiationRatio = (float64)(game.Reading.Radiation-minRadiation) / (float64)(maxRadiation-minRadiation)
 		energyLoss = radiationRatio * maxEnergyLoss
-		if float64(team.Energy)-energyLoss <= 0 {
-			team.Shield = false
+		if float64(hero.Energy)-energyLoss <= 0 {
+			hero.Shield = false
 		}
 
-		if team.Shield {
-			team.Energy = int64(math.Max(float64(team.Energy)-math.Ceil(energyLoss), 0))
-			log.Printf("Team %s: Energy -%.2f\n", team.Name, energyLoss)
+		if hero.Shield {
+			hero.Energy = int64(math.Max(float64(hero.Energy)-math.Ceil(energyLoss), 0))
+			log.Printf("Team %s: Energy -%.2f\n", hero.Name, energyLoss)
 			continue
 		}
 
 		radiationRatio = (float64)(game.Reading.Radiation-minRadiation) / (float64)(maxRadiation-minRadiation)
 		lifeLoss = radiationRatio * maxLifeLoss
-		team.Life = int64(math.Max(float64(team.Life)-math.Ceil(lifeLoss), 0))
+		hero.Life = int64(math.Max(float64(hero.Life)-math.Ceil(lifeLoss), 0))
 
 		temperatureRatio = (game.Reading.Temperature - minTemperature) / (maxTemperature - minTemperature)
 		energyGain = temperatureRatio * maxEnergyGain
-		team.Energy = int64(math.Min(float64(team.Energy)+math.Ceil(energyGain), 100))
+		hero.Energy = int64(math.Min(float64(hero.Energy)+math.Ceil(energyGain), 100))
 
-		log.Printf("Team %s: Life -%.2f, Energy +%.2f\n", team.Name, lifeLoss, energyGain)
+		log.Printf("Hero %s : Life -%.2f, Energy +%.2f\n", hero.Name, lifeLoss, energyGain)
 	}
 
-	log.Println("Exiting goroutine for team", team.Name)
+	log.Println("Exiting goroutine for Hero: %s", hero.Name)
 	wg.Done()
 }

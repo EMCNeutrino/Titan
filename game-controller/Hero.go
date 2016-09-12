@@ -19,6 +19,8 @@ type Hero struct {
 	Online   bool	`json:"online"`
 	Penalties []Penalty `json:"penalties"`
 	Items     []Item    `json:"Items"`
+	Xpos	int64	 `json:"xpos"`
+	Ypos	int64	 `json:"ypos"`
 
 }
 

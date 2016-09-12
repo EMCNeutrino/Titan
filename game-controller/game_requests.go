@@ -40,3 +40,4 @@ type ReadingsRequest struct {
 	TokenRequest
 	readings Reading
 }
+
