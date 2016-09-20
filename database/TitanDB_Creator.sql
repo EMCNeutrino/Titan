@@ -12,6 +12,13 @@
 ** 1    09/19/2016 PBM       Created
 *******************************/
 
+# Creating the TitanDB
+CREATE DATABASE IF NOT EXISTS titandb;
+
+# Create User and assign Permisions
+CREATE USER 'titanuser'@localhost IDENTIFIED BY  'Neutrin0R0cks';
+GRANT ALL ON titandb.* TO 'titanuser' IDENTIFIED BY 'Neutrin0R0cks';
+
 # Drop Tables
 DROP TABLE item;
 DROP TABLE penalty;
