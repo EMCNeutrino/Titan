@@ -11,6 +11,7 @@ type Hero struct {
 	Twitter  string `json:"twitter"`
 	Email    string `json:"email"`
 	Title    string `json:"title"`
+	HRace    string `json:"herorace"`
 	IsAdmin  bool	`json:"isadmin"`
 	Level    int	`json:"level"`
 	HClass   string	`json:"heroclass"`
