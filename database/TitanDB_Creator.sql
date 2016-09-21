@@ -32,6 +32,8 @@ CREATE TABLE hero
 (
     hero_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     hero_name TEXT,
+    player_name TEXT,
+    player_lastname TEXT,
     token TEXT,
     userpass TEXT,
     energy INT,

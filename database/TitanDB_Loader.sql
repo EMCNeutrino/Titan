@@ -25,13 +25,14 @@ SET @total_items = NULL;
 
 # Generates Random Number
 
-
 #Inserting Gandalf
 
 INSERT INTO hero (
 
 
     hero_name,
+    player_name,
+    player_lastname,
     token,
     userpass,
     energy,
@@ -49,6 +50,8 @@ INSERT INTO hero (
     ypos
 ) VALUES (
     'Gandalf',
+    'Pat',
+    'Butler',
     '123123123123',
     'userPass',
     200,
@@ -144,6 +147,8 @@ INSERT INTO hero (
 
 
     hero_name,
+    player_name,
+    player_lastname,
     token,
     userpass,
     energy,
@@ -161,6 +166,8 @@ INSERT INTO hero (
     ypos
 ) VALUES (
     'Galadrial',
+    'Concha',
+    'Velasco',
     '43534534534534',
     'userPass2',
     220,
@@ -259,6 +266,8 @@ INSERT INTO hero (
 
 
     hero_name,
+    player_name,
+    player_lastname,
     token,
     userpass,
     energy,
@@ -276,6 +285,8 @@ INSERT INTO hero (
     ypos
 ) VALUES (
     'Legolas',
+    'Magdy',
+    'The Great',
     '4353453232334234534534',
     'userPass3',
     250,
