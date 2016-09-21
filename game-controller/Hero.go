@@ -7,10 +7,6 @@ type Hero struct {
 	UserLastName 	string 	`json:"userlastname"`
 	HeroName     	string	`json:"heroname"`
 	token    	string 	`json:"token"`
-	Energy   	int64	`json:"energy"`
-	Life     	int64	`json:"life"`
-	Shield   	bool	`json:"shield"`
-	// New Hero Fields
 	Twitter  	string	`json:"twitter"`
 	Email    	string	`json:"email"`
 	Title    	string	`json:"title"`
