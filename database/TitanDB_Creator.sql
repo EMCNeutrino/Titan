@@ -16,8 +16,8 @@
 CREATE DATABASE IF NOT EXISTS titandb;
 
 # Create User and assign Permisions
-CREATE USER 'titanuser'@localhost IDENTIFIED BY  'Neutrin0R0cks';
-GRANT ALL ON titandb.* TO 'titanuser' IDENTIFIED BY 'Neutrin0R0cks';
+CREATE USER 'titanuser'@localhost IDENTIFIED BY  'Neutrin0R0cks!';
+GRANT ALL ON titandb.* TO 'titanuser' IDENTIFIED BY 'Neutrin0R0cks!';
 
 # Drop Tables
 DROP TABLE item;
@@ -46,7 +46,7 @@ CREATE TABLE hero
     hclass TEXT,
     ttl INT,
     userhost TEXT,
-    online BOOL,
+    hero_online BOOL,
     xpos INT,
     ypos INT
 );
@@ -102,6 +102,4 @@ RETURNS INTEGER(11)
 DETERMINISTIC
 NO SQL
 SQL SECURITY DEFINER
-BEGIN
-  RETURN floor(pmin+RAND()*(pmax-pmin));
-END;
+RETURN floor(pmin+RAND()*(pmax-pmin));

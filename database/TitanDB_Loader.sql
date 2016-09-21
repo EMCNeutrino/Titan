@@ -45,7 +45,7 @@ INSERT INTO hero (
     hclass,
     ttl,
     userhost,
-    online,
+    hero_online,
     xpos,
     ypos
 ) VALUES (
@@ -161,7 +161,7 @@ INSERT INTO hero (
     hclass,
     ttl,
     userhost,
-    online,
+    hero_online,
     xpos,
     ypos
 ) VALUES (
@@ -280,7 +280,7 @@ INSERT INTO hero (
     hclass,
     ttl,
     userhost,
-    online,
+    hero_online,
     xpos,
     ypos
 ) VALUES (
