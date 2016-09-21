@@ -2,30 +2,34 @@ package main
 
 // Hero struct contains information about each Hero
 type Hero struct {
-	Name     string	`json:"name"`
-	token    string
-	Energy   int64	`json:"energy"`
-	Life     int64	`json:"life"`
-	Shield   bool	`json:"shield"`
+	HeroID		int64  	`json:"heroid"`
+	UserName	string 	`json:"username"`
+	UserLastName 	string 	`json:"userlastname"`
+	HeroName     	string	`json:"heroname"`
+	token    	string 	`json:"token"`
+	Energy   	int64	`json:"energy"`
+	Life     	int64	`json:"life"`
+	Shield   	bool	`json:"shield"`
 	// New Hero Fields
-	Twitter  string `json:"twitter"`
-	Email    string `json:"email"`
-	Title    string `json:"title"`
-	HRace    string `json:"herorace"`
-	IsAdmin  bool	`json:"isadmin"`
-	Level    int	`json:"level"`
-	HClass   string	`json:"heroclass"`
-	TTL      int64	`json:"energy"`
-	Userhost string	`json:"userhost"`
-	Online   bool	`json:"online"`
-	Penalties []Penalty `json:"penalties"`
-	Items     []Item    `json:"Items"`
-	Xpos	int64	 `json:"xpos"`
-	Ypos	int64	 `json:"ypos"`
+	Twitter  	string	`json:"twitter"`
+	Email    	string	`json:"email"`
+	Title    	string	`json:"title"`
+	HRace    	string	`json:"herorace"`
+	IsAdmin  	bool	`json:"isadmin"`
+	Level    	int	`json:"level"`
+	HClass   	string	`json:"heroclass"`
+	TTL      	int64	`json:"energy"`
+	Userhost 	string	`json:"userhost"`
+	Online   	bool	`json:"online"`
+	Xpos		int64	`json:"xpos"`
+	Ypos		int64	`json:"ypos"`
+	Penalties 	[]Penalty `json:"penalties"`
+	Items     	[]Item    `json:"Items"`
 
 }
 
 type Penalty struct {
+	PenaltyID  int64     `json:"penaltyid"`
 	Logout  int64        `json:"logout"`
 	Quest   int64        `json:"quest"`
 	Quit    int64        `json:"quit"`
@@ -35,6 +39,7 @@ type Penalty struct {
 
 type Item struct {
 
+	ItemID   int64  `json:"int64"`
 	Weapon   int64	`json:"weapon"`
 	Tunic    int64	`json:"tunic"`
 	Shield   int64	`json:"shield"`
