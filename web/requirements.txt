@@ -4,3 +4,4 @@ django-bootstrap-themes==3.3.6
 django-countries==4.0
 gunicorn==19.6.0
 whitenoise==3.2.1
+django-formtools==1.0

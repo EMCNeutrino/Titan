@@ -2,26 +2,30 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
+from formtools.wizard.views import SessionWizardView
 
-from app.forms import RegistrationForm
+from app.forms import RegistrationInitForm, RegistrationAgreeForm
+
+FORMS = [
+    ("init", RegistrationInitForm),
+    ("agree", RegistrationAgreeForm)
+]
+
+TEMPLATES = {
+    "init": "registration/init.html",
+    "agree": "registration/agree.html",
+}
 
 
 def index(request):
     return render(request, 'index.html', {})
 
 
-class RegistrationView(View):
-    form_class = RegistrationForm
-    template_name = 'registration.html'
+class RegistrationWizard(SessionWizardView):
+    def get_template_names(self):
+        return [TEMPLATES[self.steps.current]]
 
-    def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if not form.is_valid():
-            return render(request, self.template_name, {'form': form})
+    def done(self, form_list, form_dict, **kwargs):
         return HttpResponseRedirect(reverse('index'))
 
 

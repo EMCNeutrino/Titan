@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap_themes',
     'bootstrap3',
     'django_countries',
+    'formtools',
     'app',
 ]
 
