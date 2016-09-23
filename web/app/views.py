@@ -23,3 +23,10 @@ class RegistrationView(View):
         if not form.is_valid():
             return render(request, self.template_name, {'form': form})
         return HttpResponseRedirect(reverse('index'))
+
+
+class TutorialView(View):
+    template_name = 'tutorial.html'
+
+    def get(self, request):
+        return render(request, self.template_name, {})
