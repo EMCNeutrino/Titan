@@ -3,7 +3,7 @@ language: python
 python:
   - "3.5"
 
-before_deploy: cd web
+before_install: cd web
 
 deploy:
   skip_cleanup: true
