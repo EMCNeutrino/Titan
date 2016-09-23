@@ -5,6 +5,9 @@ python:
 
 before_install: cd web
 
+script:
+  - python3 manage.py test -v 2
+
 deploy:
   skip_cleanup: true
   provider: cloudfoundry
