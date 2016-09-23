@@ -1,9 +1,13 @@
 language: python
 
+python:
+  - "3.5"
+
 before_deploy:
   - cd web
+
 deploy:
-  edge: true
+  skip_cleanup: true
   provider: cloudfoundry
   api: https://api.run.pivotal.io
   username: adrian.moreno@emc.com
