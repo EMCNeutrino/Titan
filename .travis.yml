@@ -1,4 +1,7 @@
+language: python
+
 deploy:
+  edge: true
   provider: cloudfoundry
   api: https://api.run.pivotal.io
   username: adrian.moreno@emc.com
