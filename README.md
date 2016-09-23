@@ -1,4 +1,4 @@
-# Hero
+# Hero [![Build Status](https://travis-ci.org/VxRackNeutrino/Hero.svg?branch=develop)](https://travis-ci.org/VxRackNeutrino/Hero)
 
 ## Introduction
 
