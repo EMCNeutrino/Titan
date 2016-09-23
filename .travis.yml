@@ -18,5 +18,5 @@ deploy:
   organization: vxrackneutrino
   space: development
   on:
-    repo: VxRackNeutrino/Hero/web
+    repo: VxRackNeutrino/Hero
     branch: develop
