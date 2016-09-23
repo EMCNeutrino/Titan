@@ -1,0 +1,11 @@
+deploy:
+  provider: cloudfoundry
+  api: https://api.run.pivotal.io
+  username: adrian.moreno@emc.com
+  password:
+    secure: zkzwr+KbLh+jyIHZXgH/dtqPSCBAVv7YPKAE7+DWG7blj/X/f4Kya01BIy8TSy7zk7ZrhG+T+OtlsNcN2MyteEAYmVUXBf1QvpO2CVciCZLZcK+0Ll3Hn/aVbcsXdEGXJcEMV/fhlhx4sEEpUhm93V3pDxRHr12SHrXMBs4bB7KM9iUCXOFTULgTG4cT6+E70IFTEoJFjcRf/I29OrFpdubLii+idbxm7TUvxMUNB1vaZSw8ZOpvYKZ0v4K3SEJygxiquzw4mlEKIUoEPNuE61vxC7dRiZDfHYy8i4oN4Oi+P17GOXm9K7MYZybvcxwuZCvOvPCVPDBsyHafY/TYzZI3pMicH1kan+5LFoDn3h5SDjkNhWY6EQT//QxHGJI0N73Y46gHKkp0qzg5S5BAi4/4Dx6Ib+HKvnuSXreOjf5I/d07FeB80DIJCzuxhaiWp3MgXqNW3dtCOQPEpLuR6ayrVIRRDAgE6LY9NG8+i4wOzwbO+jH7kPQNucOXCM/ubnIUsIQlO8fcYdjTiBu+btmDlsCY5cASX3wUPbAhRlNmtGvZxy8NfomdrMCMVo/9C/KSrGHO1OqP0VYHwi4TPbMffMVUPwA/C2pQsQtp4bnlm+tGYYE8uUGW8bUlgGHiRThFKjGsUbS9rg4caJgu4i/jW9KvRkru8ifQNW6i40s=
+  organization: vxrackneutrino
+  space: development
+  on:
+    repo: VxRackNeutrino/Hero
+    branch: develop
