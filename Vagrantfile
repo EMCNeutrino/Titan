@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder ".", "/home/ubuntu/src"
 
   config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 3306, host: 3306
 
   config.vm.provision "shell", path: "provision.sh"
 
