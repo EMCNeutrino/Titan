@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 {% load bootstrap_themes %}
-
+{% load tags %}
 
 
 <!DOCTYPE html>
@@ -40,10 +40,10 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="{% url 'index' %}">Home</a></li>
-              <li><a href="{% url 'registration' %}">Registration</a></li>
-              <li><a href="{% url 'tutorial' %}">Tutorial</a></li>
-              <li><a href="#">Hero game</a></li>
+              <li class="{% active '^/$' %}"><a href="{% url 'index' %}">Home</a></li>
+              <li class="{% active 'registration' %}"><a href="{% url 'registration' %}">Registration</a></li>
+              <li class="{% active 'tutorial' %}"><a href="{% url 'tutorial' %}">Tutorial</a></li>
+              <li class="{% active 'hero' %}"><a href="#">Hero game</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
