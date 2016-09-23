@@ -4,9 +4,9 @@
 
 {% block content %}
 
-    <form class="form-horizontal" method="post" action="{% url 'registration' %}">
+    <form method="post" action="{% url 'registration' %}">
         {% csrf_token %}
-        {% bootstrap_form form layout='horizontal' %}
+        {% bootstrap_form form %}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 

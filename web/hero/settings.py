@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'bootstrap_themes',
+    'django_countries',
     'app',
 ]
 
