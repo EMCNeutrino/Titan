@@ -1,8 +1,8 @@
-# Titan
+# Hero
 
 ## Introduction
 
-Titan is a [Microservice](http://en.wikipedia.org/wiki/Microservices "Microservices") application that enables to play Idle RPG using VMs in an OpenStack environment.
+Titan is a [microservices](http://en.wikipedia.org/wiki/Microservices) application that enables to play Idle RPG using VMs in an OpenStack environment.
 
 
 ## How to use it
