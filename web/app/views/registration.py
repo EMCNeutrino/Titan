@@ -1,7 +1,4 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
-from django.views import View
 from formtools.wizard.views import SessionWizardView
 
 from app.forms import RegistrationInitForm, RegistrationAgreeForm, RegistrationHeroForm, RegistrationPasswordForm
@@ -21,10 +18,6 @@ TEMPLATES = {
 }
 
 
-def index(request):
-    return render(request, 'index.html', {})
-
-
 class RegistrationWizard(SessionWizardView):
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
@@ -35,9 +28,3 @@ class RegistrationWizard(SessionWizardView):
             'form_data': [form.cleaned_data for form in form_list],
         })
 
-
-class TutorialView(View):
-    template_name = 'tutorial.html'
-
-    def get(self, request):
-        return render(request, self.template_name, {})
