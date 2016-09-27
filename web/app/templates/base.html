@@ -20,6 +20,9 @@
     <!-- Bootstrap CSS -->
     {% bootstrap_styles theme='darkly' type='min.css' %}
 
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+
 
   </head>
 
@@ -53,7 +56,8 @@
       {% endblock %}
 
       <!-- Site footer -->
-      <footer class="footer">
+
+      <footer class="col-xs-12 footer">
         <p>&copy; 2016 Dell EMC</p>
       </footer>
 
