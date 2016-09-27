@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
+import django_rq
 
 from app.forms import RegistrationInitForm, RegistrationAgreeForm, RegistrationHeroForm, RegistrationPasswordForm
+from app.tasks import register_user
 
 FORMS = [
     ("init", RegistrationInitForm),
@@ -23,8 +25,9 @@ class RegistrationWizard(SessionWizardView):
         return [TEMPLATES[self.steps.current]]
 
     def done(self, form_list, form_dict, **kwargs):
-
+        form_data = [form.cleaned_data for form in form_list]
+        django_rq.enqueue(register_user, form_data)
         return render(self.request, 'registration/done.html', {
-            'form_data': [form.cleaned_data for form in form_list],
+            'form_data': form_data,
         })
 
