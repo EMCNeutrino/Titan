@@ -1,15 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-sudo apt-get update
+# Variables
+MYSQL_PASSWD=root
 
-# Python3
-sudo apt-get install -y python3 python3-dev python3-pip python3-setuptools
+echo -e "\n--- Updating packages list ---\n"
+apt-get -qq update
 
-# Mysql Server 5.7
-sudo apt-get install -y mysql-server
+echo -e "\n--- Install base packages ---\n"
+apt-get install -y python3 python3-dev python3-pip python3-setuptools
 
-# Redis
-sudo apt-get install -y redis
+echo -e "\n--- Install MySQL specific packages and settings ---\n"
+debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWD"
+debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWD"
+apt-get -y install mysql-server
 
-# Python dependencies for Django website
-sudo pip3 install -r web/requirements.txt
+echo -e "\n--- Install Redis server ---\n"
+apt-get install -y redis-server
+
+echo -e "\n--- Install Python packages for Registration website ---\n"
+pip3 install -r /home/ubuntu/src/web/requirements.txt
