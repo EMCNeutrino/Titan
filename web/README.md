@@ -7,7 +7,7 @@ Upon each completed registration, this components will generate a JSON message w
 | **Field** | **Required** | **Description** |
 |---|---|---|
 | `first_name` | yes | First name |
-| `last_name` | yes | Last name |
+| `last_name` | yes | Last name |
 | `email` | yes | Email address |
 | `country` | yes | ISO 3166-1. Two-letter code of the country |
 | `password` | yes | SHA256 of the password |
@@ -32,7 +32,7 @@ Example:
     "twitter_handle": "john_doe",
     "hero_name": "Gandalf",
     "hero_class": "Magician",
-    "hero_title": "The Great",
+    "hero_title": "The Great"
 }
 ```
 
