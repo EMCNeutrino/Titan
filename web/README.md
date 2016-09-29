@@ -22,17 +22,17 @@ Example:
 
 ```json
 {
-    "country": "ES",
     "first_name": "John",
-    "password": "89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8",
-    "hero_name": "Gandalf",
-    "hero_title": "The Great",
-    "phone": "912312312",
-    "hero_class": "Magician",
-    "company": "EMC",
+    "last_name": "Doe",
     "email": "johndoe@example.com",
+    "country": "ES",
+    "password": "89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8",
+    "company": "EMC",
+    "phone": "912312312",
     "twitter_handle": "john_doe",
-    "last_name": "Doe"
+    "hero_name": "Gandalf",
+    "hero_class": "Magician",
+    "hero_title": "The Great",
 }
 ```
 
