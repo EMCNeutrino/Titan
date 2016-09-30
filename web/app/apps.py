@@ -1,6 +1,4 @@
 from django.apps import AppConfig
-from app import helpers
-
 
 
 class MyAppConfig(AppConfig):

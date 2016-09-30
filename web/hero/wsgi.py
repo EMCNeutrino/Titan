@@ -14,14 +14,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hero.settings")
 
 from configurations.wsgi import get_wsgi_application
 from whitenoise.django import DjangoWhiteNoise
-from app import helpers
-import pika
-
-try:
-    c = helpers.get_rabbitmq_connection()
-    c.close()
-except pika.exceptions.ConnectionClosed:
-    raise Exception('Cannot connect to RabbitMQ. Please check the connection details.')
 
 application = get_wsgi_application()
 application = DjangoWhiteNoise(application)
