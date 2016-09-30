@@ -13,4 +13,6 @@ RUN python3 manage.py migrate --no-input &&\
 
 EXPOSE 8080
 
+ENV DJANGO_CONFIGURATION=Prod
+
 CMD ["honcho", "start"]

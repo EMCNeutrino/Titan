@@ -52,8 +52,7 @@ docker run -d \
   -e RABBITMQ_PORT=5672 \
   -e RABBITMQ_USER=guest \
   -e RABBITMQ_PASSWORD=guest \
-  -e REGISTRATION_QUEUE=registration \
-  -p 9000:80 \
+  -p 8000:8080 \
   --name hero-web \
   hero-web
 ```
