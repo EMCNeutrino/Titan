@@ -1,0 +1,30 @@
+#
+# the demoadmin user is created with following properties on Neutrino UI
+# Account/Domain roles:  Account Monitor (monitor)
+# Project project: project_demo
+# Primary Project Roles: admin, openstack_admin, heat_stack_owner
+#
+
+# Modify HEAT_* parameters if you want to run the heat template to create
+# another set 
+
+unset ${!OS_*}
+export OS_AUTH_URL=https://10.246.152.160:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_USERNAME=demoadmin
+export OS_PASSWORD=admin123
+export OS_PROJECT_NAME=project_demo
+export OS_USER_DOMAIN_NAME=demo
+export OS_PROJECT_DOMAIN_NAME=demo
+
+unset ${!HEAT_*}
+export HEAT_PREFIX=hero
+export HEAT_IMAGE_ID=${HEAT_PREFIX}-ubuntu-14.04
+export HEAT_FLAVOR_ID=m1.tiny
+export HEAT_IMAGE_LOCATION=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+export HEAT_KEY_ID=${HEAT_PREFIX}-keypair
+export HEAT_PUBLIC_NETWORK=public
+export HEAT_NET_ID=${HEAT_PREFIX}-network
+export HEAT_SECGROUP_ID=${HEAT_PREFIX}-secgroup
+export HEAT_DNS_SERVERS="10.247.134.40,10.247.134.41"
+
