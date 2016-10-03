@@ -1,12 +1,17 @@
 language: python
 
 python:
-- '3.5'
+  - '3.5'
 
 before_install: cd web
 
+install:
+  - curl -o swagger https://github.com/go-swagger/go-swagger/releases/download/0.6.0/swagger_linux_amd64
+  - chmod +x ./swagger
+
 script:
-- python3 manage.py test -v 2
+  - python3 manage.py test -v 2
+  - ./swagger validate ../game-engine/swagger.yaml
 
 deploy:
   provider: cloudfoundry
