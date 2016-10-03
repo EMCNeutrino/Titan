@@ -6,6 +6,7 @@ python:
 before_install: cd web
 
 install:
+  - pip3 install -r requirements.txt
   - curl -o swagger https://github.com/go-swagger/go-swagger/releases/download/0.6.0/swagger_linux_amd64
   - chmod +x ./swagger
 
