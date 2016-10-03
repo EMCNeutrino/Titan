@@ -85,6 +85,44 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /hero/{hero-id}/events:
+    parameters:
+      - $ref: '#/parameters/hero-id'
+    get:
+      description: |
+        Returns the events for a particular Hero
+      tags:
+        - Hero
+        - Event
+      responses:
+        200:
+          description: An array of Event objects
+          properties:
+              data:
+                $ref: '#/definitions/Event'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /events:
+    get:
+      description: |
+        Returns all the events
+      tags:
+        - Event
+      responses:
+        200:
+          description: An array of Event objects
+          properties:
+              data:
+                $ref: '#/definitions/Event'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
 ##########################
 # Definitions            #
 ##########################
@@ -94,10 +132,13 @@ definitions:
     properties:
       id:
         type: string
-        description: Unique identifier for the Hero
+        description: Unique identifier for the Hero (UUID)
       email:
         type: string
         description: Email of the player
+      enabled:
+        type: boolean
+        description: Boolean indicating whether the Hero is enabled or not
       name:
         type: string
         description: Name of the Hero
@@ -119,6 +160,20 @@ definitions:
       created_at:
         type: integer
         description: Unix timestamp representing the time it was created.
+
+  Event:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the Event (UUID)
+      hero_id:
+        type: string
+        description: Unique identifier for the Hero (UUID)
+      message:
+        type: string
+        description: Event message
+
   Error:
     type: object
     properties:
