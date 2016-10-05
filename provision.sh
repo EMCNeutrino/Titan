@@ -30,6 +30,6 @@ mv go /usr/local
 mkdir -p ./work/github.com/VxRackNeutrino/Hero/
 ln -s /home/ubuntu/src/game-engine ./work/github.com/VxRackNeutrino/Hero/game-engine
 cat <<EOT >> ./.profile
-export GOPATH=$HOME/work
+export GOPATH=/home/ubuntu/work
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 EOT
