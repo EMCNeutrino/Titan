@@ -7,8 +7,7 @@ import (
 
 func main() {
   configRuntime()
-  StartEngine()
-  StartAPI()
+  StartGame()
 }
 
 func configRuntime() {

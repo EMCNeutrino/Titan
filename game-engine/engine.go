@@ -6,7 +6,7 @@ import (
   log "github.com/Sirupsen/logrus"
 )
 
-type Engine struct {
+type Game struct {
   startedAt  time.Time
   heros      []Hero
   adminToken string
@@ -38,42 +38,43 @@ type Equipment struct {
   boots    int
 }
 
-// NewEngine creates a new game engine
-func NewEngine() *Engine {
-  engine := &Engine{
+// NewGame creates a new game
+func NewGame() *Game {
+  game := &Game{
     startedAt: time.Now(),
     heros:     []Hero{},
     exitChan:  make(chan []byte),
   }
-  return engine
+  return game
 }
 
-// StartEngine starts the game engine
-func StartEngine() {
-  engine := NewEngine()
+// StartGame starts the game
+func StartGame() {
+  game := NewGame()
 
-  go engine.Start()
+  go game.StartEngine()
+  game.StartAPI()
 }
 
-// Start starts the engine
-func (e *Engine) Start() {
+// StartEngine starts the engine
+func (g *Game) StartEngine() {
   ticker := time.NewTicker(time.Second * 2)
   for {
     select {
     case <-ticker.C:
       log.Info("Ticker")
-      e.movePlayers()
-    case <-e.exitChan:
+      g.movePlayers()
+    case <-g.exitChan:
       log.Info("Exiting game")
       return
     }
   }
 }
 
-func (e *Engine) movePlayers() {
+func (g *Game) movePlayers() {
   log.Info("Move Players")
 }
 
-func (e *Engine) authorizeAdmin(token string) bool {
-  return e.adminToken == token
+func (g *Game) authorizeAdmin(token string) bool {
+  return g.adminToken == token
 }
