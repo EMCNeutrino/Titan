@@ -2,12 +2,21 @@ package main
 
 import (
   "fmt"
+  "log"
+  "os"
   "runtime"
 )
 
 func main() {
+
+  adminToken := os.Getenv("ADMIN_TOKEN")
+  if len(adminToken) <= 0 {
+    adminToken = randToken()
+    log.Printf("Admin token not defined. Using '%s'", adminToken)
+  }
+
   configRuntime()
-  StartGame()
+  StartGame(adminToken)
 }
 
 func configRuntime() {
