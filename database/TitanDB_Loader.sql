@@ -16,14 +16,19 @@
 DELETE FROM  item;
 DELETE FROM  penalty;
 DELETE FROM  hero;
+DELETE FROM  heroworldevent;
+DELETE FROM  worldeventtype;
+DELETE FROM  worldevent;
 
 ALTER TABLE item AUTO_INCREMENT = 1;
 ALTER TABLE penalty AUTO_INCREMENT = 1;
 ALTER TABLE hero AUTO_INCREMENT = 1;
+ALTER TABLE heroworldevent AUTO_INCREMENT = 1;
+ALTER TABLE worldeventtype AUTO_INCREMENT = 1;
+ALTER TABLE worldevent AUTO_INCREMENT = 1;
 
 # Change the number in the procedure to N heros
 Call create_heros(10);
-
 
 SELECT * FROM hero;
 SELECT * FROM penalty;

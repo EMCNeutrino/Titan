@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS item;
 DROP TABLE IF EXISTS  penalty;
 DROP TABLE IF EXISTS  heroworldevent;
 DROP TABLE IF EXISTS  hero;
+DROP TABLE IF EXISTS  worldeventtype;
 DROP TABLE IF EXISTS  worldevent;
 
 #Drop Functions
@@ -103,15 +104,28 @@ CREATE TABLE `penalty` (
   
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Penalties table stores the penalties accumulated by a hero';
 
-CREATE TABLE `worldevent` (
 
-  `worldevent_id` 	int(11) NOT NULL AUTO_INCREMENT,
-  `event_text` 		text,
-  `event_time` 		DATETIME DEFAULT NOW(),
-  
+CREATE TABLE `worldeventtype` (
+  `idworldeventtype_id` int(11) NOT NULL AUTO_INCREMENT,
+  `type_text` varchar(45) NOT NULL,
+  PRIMARY KEY (`idworldeventtype_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table contains the types of world events. It is used for tracking the events';
+
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Combat");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Level");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Goodsend");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Calamity");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Quest");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Creep");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Moster");
+
+
+CREATE TABLE `worldevent` (
+  `worldevent_id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_text` text,
+  `event_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`worldevent_id`)
-  
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='WorldEvent table contains the events happening in the world ';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COMMENT='WorldEvent table contains the events happening in the world ';
 
 
 CREATE TABLE `heroworldevent` (
