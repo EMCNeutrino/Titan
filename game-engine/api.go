@@ -6,6 +6,12 @@ import (
   "github.com/gin-gonic/gin"
 )
 
+type Join struct {
+  Name      string `json:"name" binding:"required"`
+  HeroClass string `json:"heroClass" binding:"required"`
+  Email     string `json:"email" binding:"required"`
+}
+
 type API struct {
   game *Game
 }
@@ -34,8 +40,21 @@ func (api *API) heroPost(c *gin.Context) {
     c.String(http.StatusUnauthorized, "No auth token is present")
     return
   }
-  api.game.joinChan <- token
-  c.String(http.StatusOK, "Hero Post")
+
+  var json Join
+  if err := c.BindJSON(&json); err != nil {
+    c.String(http.StatusBadRequest, "Invalid request body")
+    return
+  }
+
+  req := JoinRequest{TokenRequest: TokenRequest{GameRequest: GameRequest{Response: make(chan GameResponse)}, token: token}, name: json.Name, email: json.Email, heroClass: json.HeroClass}
+  api.game.joinChan <- req
+  res := <-req.Response
+  if res.success {
+    c.String(http.StatusOK, res.message)
+  } else {
+    c.String(http.StatusBadRequest, res.message)
+  }
 }
 
 func (api *API) heroGet(c *gin.Context) {
