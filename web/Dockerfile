@@ -1,6 +1,8 @@
-FROM python:3.5-alpine
+FROM python:3.5
 
 MAINTAINER Adrian Moreno <adrian.moreno@dell.com>
+
+
 
 COPY . /usr/src/app
 
