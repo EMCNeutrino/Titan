@@ -78,8 +78,8 @@ CREATE TABLE `item` (
   `energy` 	int(11) DEFAULT NULL,
   `helm` 	int(11) DEFAULT NULL,
   `charm` 	int(11) DEFAULT NULL,
-  `Amulet` 	int(11) DEFAULT NULL,
-  `Total` 	int(11) DEFAULT NULL,
+  `amulet` 	int(11) DEFAULT NULL,
+  `total` 	int(11) DEFAULT NULL,
   
   PRIMARY KEY (`item_id`),
   KEY `item_hero_hero_id_fk` (`hero_id`),
@@ -448,7 +448,7 @@ END$$
 DELIMITER ;
 
 
-DROP PROCEDURE IF EXISTS create_heros
+DROP PROCEDURE IF EXISTS create_heros;
 
 DELIMITER $$
 CREATE DEFINER=`titanuser`@`%` PROCEDURE `create_heros`(IN heronum INT)
