@@ -24,14 +24,14 @@ func (g *Game) StartAPI() {
   router := gin.Default()
   router.GET("/hero", api.heroList)
   router.POST("/hero", api.heroPost)
-  router.GET("/hero/:id", api.heroGet)
-  router.GET("/hero/:id/activate", api.heroActivate)
+  router.GET("/hero/:name", api.heroGet)
+  router.GET("/hero/:name/activate", api.heroActivate)
   router.GET("/exit", api.exit)
   router.Run(":8080")
 }
 
 func (api *API) heroList(c *gin.Context) {
-  c.JSON(http.StatusOK, gin.H{"heros": api.game.heros, "count": len(api.game.heros)})
+  c.JSON(http.StatusOK, gin.H{"heroes": api.game.heroes, "count": len(api.game.heroes)})
 }
 
 func (api *API) heroPost(c *gin.Context) {
@@ -58,13 +58,26 @@ func (api *API) heroPost(c *gin.Context) {
 }
 
 func (api *API) heroGet(c *gin.Context) {
-  id := c.Param("id")
-  c.String(http.StatusOK, "Hero Get ID: %s", id)
+  name := c.Param("name")
+  c.String(http.StatusOK, "Hello Get ID: %s", name)
 }
 
 func (api *API) heroActivate(c *gin.Context) {
-  id := c.Param("id")
-  c.String(http.StatusOK, "Hello Activate ID: %s", id)
+  name := c.Param("name")
+  token := c.Request.Header.Get("X-Auth-Token")
+  if len(token) == 0 {
+    c.String(http.StatusUnauthorized, "No auth token is present")
+    return
+  }
+
+  req := ActivateHeroRequest{TokenRequest: TokenRequest{GameRequest: GameRequest{Response: make(chan GameResponse)}, token: token}, name: name}
+  api.game.activateHeroChan <- req
+  res := <-req.Response
+  if res.success {
+    c.String(http.StatusOK, res.message)
+  } else {
+    c.String(http.StatusBadRequest, res.message)
+  }
 }
 
 func (api *API) exit(c *gin.Context) {

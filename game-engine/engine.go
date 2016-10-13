@@ -1,6 +1,7 @@
 package main
 
 import (
+  "fmt"
   "math/rand"
   "time"
 
@@ -15,25 +16,26 @@ const (
 )
 
 type Game struct {
-  startedAt  time.Time
-  heros      []Hero
-  adminToken string
-  joinChan   chan JoinRequest
-  exitChan   chan []byte
+  startedAt        time.Time
+  heroes           []Hero
+  adminToken       string
+  joinChan         chan JoinRequest
+  activateHeroChan chan ActivateHeroRequest
+  exitChan         chan []byte
 }
 
 type Hero struct {
-  Name      string `json:"name"`
-  Email     string `json:"email"`
-  Class     string `json:"class"`
-  enabled   bool
-  token     string
-  Level     int `json:"level"`
-  ttl       int
-  createdAt time.Time
-  Equipment Equipment `json:"equipment"`
-  Xpos      int       `json:"x_pos"`
-  Ypos      int       `json:"y_pos"`
+  Name        string `json:"name"`
+  Email       string `json:"email"`
+  Class       string `json:"class"`
+  Enabled     bool   `json:"enabled"`
+  token       string
+  Level       int `json:"level"`
+  nextLevelAt time.Time
+  createdAt   time.Time
+  Equipment   Equipment `json:"equipment"`
+  Xpos        int       `json:"x_pos"`
+  Ypos        int       `json:"y_pos"`
 }
 
 type Equipment struct {
@@ -52,11 +54,12 @@ type Equipment struct {
 // NewGame creates a new game
 func NewGame(adminToken string) *Game {
   game := &Game{
-    startedAt:  time.Now(),
-    heros:      []Hero{},
-    joinChan:   make(chan JoinRequest),
-    exitChan:   make(chan []byte),
-    adminToken: adminToken,
+    startedAt:        time.Now(),
+    heroes:           []Hero{},
+    joinChan:         make(chan JoinRequest),
+    activateHeroChan: make(chan ActivateHeroRequest),
+    exitChan:         make(chan []byte),
+    adminToken:       adminToken,
   }
   return game
 }
@@ -75,36 +78,42 @@ func (g *Game) StartEngine() {
   for {
     select {
     case <-ticker.C:
-      g.movePlayers()
+      g.moveHeroes()
+      g.checkLevels()
+      //TODO: check battles
     case req := <-g.joinChan:
       log.Info("Join hero")
-      success, message := g.joinPlayer(req.name, req.email, req.heroClass, req.TokenRequest.token)
+      success, message := g.joinHero(req.name, req.email, req.heroClass, req.TokenRequest.token)
       req.Response <- GameResponse{success: success, message: message}
+      close(req.Response)
+    case req := <-g.activateHeroChan:
+      log.Info("Activate hero")
+      success := g.activateHero(req.name, req.TokenRequest.token)
+      req.Response <- GameResponse{success: success, message: ""}
       close(req.Response)
     case <-g.exitChan:
       log.Info("Exiting game")
-
       return
     }
   }
 
 }
 
-func (g *Game) joinPlayer(name, email, class, adminToken string) (bool, string) {
+func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
 
   if !g.authorizeAdmin(adminToken) {
     return false, "You are not authorized to perform this action."
   }
 
   hero := &Hero{
-    Name:      name,
-    Email:     email,
-    Class:     class,
-    enabled:   false,
-    token:     randToken(),
-    Level:     1,
-    ttl:       1,
-    createdAt: time.Now(),
+    Name:        name,
+    Email:       email,
+    Class:       class,
+    Enabled:     false,
+    token:       randToken(),
+    Level:       1,
+    nextLevelAt: time.Now().Add(99999 * time.Hour),
+    createdAt:   time.Now(),
     Equipment: Equipment{
       Ring:     0,
       Amulet:   0,
@@ -117,25 +126,61 @@ func (g *Game) joinPlayer(name, email, class, adminToken string) (bool, string) 
       Leggings: 0,
       Boots:    0,
     },
-    Xpos: 0,
-    Ypos: 0,
+    Xpos: rand.Intn(xMax-xMin) + xMin,
+    Ypos: rand.Intn(yMax-yMin) + yMin,
   }
 
-  g.heros = append(g.heros, *hero)
-  return true, ""
+  g.heroes = append(g.heroes, *hero)
+  return true, fmt.Sprintf("Token: %s", hero.token)
 }
 
-func (g *Game) activatePlayer() {
+func (g *Game) activateHero(name, token string) bool {
+  i := g.getHeroIndex(name)
+  if i == -1 {
+    return false
+  }
+  if g.heroes[i].token != token {
+    return false
+  }
 
+  g.heroes[i].Enabled = true
+  g.heroes[i].nextLevelAt = time.Now().Add(1 * time.Minute)
+  return true
 }
 
-func (g *Game) movePlayers() {
-  for i := range g.heros {
-    g.heros[i].Xpos = truncateInt(g.heros[i].Xpos+(rand.Intn(3)-1), xMin, xMax)
-    g.heros[i].Ypos = truncateInt(g.heros[i].Ypos+(rand.Intn(3)-1), yMin, yMax)
+func (g *Game) moveHeroes() {
+  for i := range g.heroes {
+    if !g.heroes[i].Enabled {
+      continue
+    }
+    g.heroes[i].Xpos = truncateInt(g.heroes[i].Xpos+(rand.Intn(3)-1), xMin, xMax)
+    g.heroes[i].Ypos = truncateInt(g.heroes[i].Ypos+(rand.Intn(3)-1), yMin, yMax)
+  }
+}
+
+func (g *Game) checkLevels() {
+  for i := range g.heroes {
+    if !g.heroes[i].Enabled {
+      continue
+    }
+
+    if g.heroes[i].nextLevelAt.Before(time.Now()) {
+      g.heroes[i].nextLevelAt = time.Now().Add(1 * time.Minute)
+      g.heroes[i].Level = g.heroes[i].Level + 1
+      log.Infof("Hero %s reached level %d", g.heroes[i].Name, g.heroes[i].Level+1)
+    }
   }
 }
 
 func (g *Game) authorizeAdmin(token string) bool {
   return g.adminToken == token
+}
+
+func (g *Game) getHeroIndex(name string) int {
+  for i, hero := range g.heroes {
+    if hero.Name == name {
+      return i
+    }
+  }
+  return -1
 }

@@ -17,10 +17,16 @@ type TokenRequest struct {
   token string
 }
 
-// JoinRequest is used when a team wants to join the game
+// JoinRequest is used when a hero wants to join the game
 type JoinRequest struct {
   TokenRequest
   name      string
   heroClass string
   email     string
+}
+
+// ActivateHeroRequest is used to activate a Hero
+type ActivateHeroRequest struct {
+  TokenRequest
+  name string
 }
