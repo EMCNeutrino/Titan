@@ -12,28 +12,28 @@
 ** 1    09/19/2016 PBM       Created
 *******************************/
 
-# Creating the TitanDB
+/* Creating the TitanDB */
 CREATE DATABASE IF NOT EXISTS titandb;
 
-# Create User and assign Permisions
-CREATE USER 'titanuser'@localhost IDENTIFIED BY  'Neutrin0R0cks!';
+/* Create User and assign Permisions */
+CREATE USER IF NOT EXISTS 'titanuser'@localhost IDENTIFIED BY 'Neutrin0R0cks!';
 GRANT ALL ON titandb.* TO 'titanuser' IDENTIFIED BY 'Neutrin0R0cks!';
 
-# Drop Tables
-DROP TABLE item;
-DROP TABLE penalty;
-DROP TABLE hero;
+USE titandb;
+GO
 
-#Drop Functions
-DROP FUNCTION randomizer;
+/* Drop Tables */
+DROP TABLE IF EXISTS `item`;
+DROP TABLE IF EXISTS `penalty`;
+DROP TABLE IF EXISTS `hero`;
 
+/* Drop Functions */
+DROP FUNCTION IF EXISTS `randomizer`;
 
 CREATE TABLE hero
 (
-    hero_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     hero_name TEXT,
-    player_name TEXT,
-    player_lastname TEXT,
     token TEXT,
     userpass TEXT,
     energy INT,
@@ -41,19 +41,18 @@ CREATE TABLE hero
     email TEXT,
     title TEXT,
     race TEXT,
-    isAdmin BOOL,
-    hero_level INT,
-    hclass TEXT,
+    is_admin BOOL,
+    level INT,
+    class TEXT,
     ttl INT,
-    userhost TEXT,
-    hero_online BOOL,
+    i_online BOOL,
     xpos INT,
     ypos INT
 );
 
 CREATE TABLE item
 (
-    item_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     hero_id INT,
     weapon INT,
     tunic INT,
@@ -67,7 +66,7 @@ CREATE TABLE item
     charm INT,
     Amulet INT,
     Total INT,
-    CONSTRAINT item_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (hero_id)
+    CONSTRAINT item_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (id)
 );
 
 
@@ -79,21 +78,21 @@ CREATE TABLE penalty
     quit INT,
     message INT,
     quest INT,
-    CONSTRAINT penalty_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (hero_id)
+    CONSTRAINT penalty_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (id)
 );
 
 
-# Add comments to each Table
-ALTER TABLE item COMMENT = 'Holds  the items owned by the hero';
+/* Add comments to each Table */
+ALTER TABLE item COMMENT = 'Holds the items owned by the hero';
 ALTER TABLE penalty COMMENT = 'Penalties table stores the penalties accumulated by a hero';
 ALTER TABLE hero COMMENT = 'Contains the Hero information';
 
 
-#Functions
+/* Functions */
 
 
-# Random Function
-# http://stackoverflow.com/questions/14798640/creating-a-random-number-using-mysql
+/* Random Function */
+/* http://stackoverflow.com/questions/14798640/creating-a-random-number-using-mysql */
 CREATE FUNCTION randomizer(
     pmin INTEGER,
     pmax INTEGER
