@@ -2,6 +2,7 @@ package main
 
 import (
   "fmt"
+  "math"
   "math/rand"
   "time"
 
@@ -9,10 +10,12 @@ import (
 )
 
 const (
-  xMax = 500
-  yMax = 500
-  xMin = 0
-  yMin = 0
+  xMax           = 500
+  yMax           = 500
+  xMin           = 0
+  yMin           = 0
+  levelUpSeconds = 600
+  levelUpBase    = float64(1.16)
 )
 
 type Game struct {
@@ -111,7 +114,7 @@ func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
     Class:       class,
     Enabled:     false,
     token:       randToken(),
-    Level:       1,
+    Level:       0,
     nextLevelAt: time.Now().Add(99999 * time.Hour),
     createdAt:   time.Now(),
     Equipment: Equipment{
@@ -131,6 +134,7 @@ func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
   }
 
   g.heroes = append(g.heroes, *hero)
+  log.Infof("Hero %s has been created, but will not play until it's activated.", hero.Name)
   return true, fmt.Sprintf("Token: %s", hero.token)
 }
 
@@ -143,8 +147,10 @@ func (g *Game) activateHero(name, token string) bool {
     return false
   }
 
+  ttl := getTTL(1) // Time to level 1
   g.heroes[i].Enabled = true
-  g.heroes[i].nextLevelAt = time.Now().Add(1 * time.Minute)
+  g.heroes[i].nextLevelAt = time.Now().Add(ttl * time.Second)
+  log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].Name, ttl)
   return true
 }
 
@@ -165,9 +171,11 @@ func (g *Game) checkLevels() {
     }
 
     if g.heroes[i].nextLevelAt.Before(time.Now()) {
-      g.heroes[i].nextLevelAt = time.Now().Add(1 * time.Minute)
-      g.heroes[i].Level = g.heroes[i].Level + 1
-      log.Infof("Hero %s reached level %d", g.heroes[i].Name, g.heroes[i].Level+1)
+      level := g.heroes[i].Level + 1
+      ttl := getTTL(level)
+      g.heroes[i].nextLevelAt = time.Now().Add(ttl * time.Second)
+      g.heroes[i].Level = level
+      log.Infof("Hero %s reached level %d. Next level in %d seconds.", g.heroes[i].Name, level, ttl)
     }
   }
 }
@@ -183,4 +191,8 @@ func (g *Game) getHeroIndex(name string) int {
     }
   }
   return -1
+}
+
+func getTTL(level int) time.Duration {
+  return time.Duration(levelUpSeconds * (math.Pow(levelUpBase, float64(level))))
 }
