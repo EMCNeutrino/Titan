@@ -172,7 +172,7 @@ func (g *Game) checkLevels() {
 
     if g.heroes[i].nextLevelAt.Before(time.Now()) {
       level := g.heroes[i].Level + 1
-      ttl := getTTL(level)
+      ttl := getTTL(level + 1)
       g.heroes[i].nextLevelAt = time.Now().Add(ttl * time.Second)
       g.heroes[i].Level = level
       log.Infof("Hero %s reached level %d. Next level in %d seconds.", g.heroes[i].Name, level, ttl)
