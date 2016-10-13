@@ -78,12 +78,19 @@ func StartGame(adminToken string) {
 // StartEngine starts the engine
 func (g *Game) StartEngine() {
   ticker := time.NewTicker(time.Second * 2)
+  tickerDB := time.NewTicker(time.Minute * 1)
+
   for {
     select {
     case <-ticker.C:
       g.moveHeroes()
       g.checkLevels()
       //TODO: check battles
+    case <-tickerDB.C:
+      log.Info("Saving game state to DB")
+      if err := saveToDB(g); err != nil {
+        log.Error(err)
+      }
     case req := <-g.joinChan:
       log.Info("Join hero")
       success, message := g.joinHero(req.name, req.email, req.heroClass, req.TokenRequest.token)
