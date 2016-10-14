@@ -58,7 +58,7 @@ CREATE TABLE equipment
     shield INT DEFAULT 0,
     leggings INT DEFAULT 0,
     boots INT DEFAULT 0,
-    CONSTRAINT item_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (id)
+    CONSTRAINT item_hero_hero_id_fk FOREIGN KEY (hero_id) REFERENCES hero (id) ON DELETE CASCADE
 );
 
 /* Add comments to each Table */
