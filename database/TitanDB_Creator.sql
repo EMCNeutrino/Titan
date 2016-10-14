@@ -34,33 +34,30 @@ DROP FUNCTION IF EXISTS randomizer;
 
 
 # Tables
-
 CREATE TABLE `hero` (
-
-  `hero_id` 		int(11) NOT NULL AUTO_INCREMENT,
-  `hero_name` 		text,
-  `player_name` 	text,
+  `hero_id` int(11) NOT NULL AUTO_INCREMENT,
+  `hero_name` text,
+  `player_name` text,
   `player_lastname` text,
-  `token` 			text,
-  `userpass` 		text,
-  `energy` 			int(11) DEFAULT NULL,
-  `twitter` 		text,
-  `email` 			text,
-  `title` 			text,
-  `race` 			text,
-  `isAdmin` 		tinyint(1) DEFAULT NULL,
-  `hero_level` 		int(11) DEFAULT NULL,
-  `hclass` 			text,
-  `ttl` 			int(11) DEFAULT NULL,
-  `userhost` 		text,
-  `hero_online` 	tinyint(1) DEFAULT NULL,
-  `xpos` 			int(11) DEFAULT NULL,
-  `ypos` 			int(11) DEFAULT NULL,
-  `next_level` 		DATETIME DEFAULT NULL,
-  `hero_created` 	TIMESTAMP DEFAULT NOW(),
-  
-  
-  PRIMARY KEY (`hero_id`)
+  `token` text,
+  `userpass` text,
+  `energy` int(11) DEFAULT NULL,
+  `twitter` text,
+  `email` varchar(255) DEFAULT NULL,
+  `title` text,
+  `race` text,
+  `isAdmin` tinyint(1) DEFAULT NULL,
+  `hero_level` int(11) DEFAULT NULL,
+  `hclass` text,
+  `ttl` int(11) DEFAULT NULL,
+  `userhost` text,
+  `hero_online` tinyint(1) DEFAULT NULL,
+  `xpos` int(11) DEFAULT NULL,
+  `ypos` int(11) DEFAULT NULL,
+  `next_level` datetime DEFAULT NULL,
+  `hero_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`hero_id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
   
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Contains the Hero information';
 
@@ -312,7 +309,7 @@ BEGIN
 	SET @hero_name = (SELECT CONCAT(generate_fname(),' ', generate_lname()) as hero_name);
 	SET @player_name = (generate_fname());
 	SET @player_lastname = (generate_lname());
-	SET @email = (CONCAT(@player_name, '.', @player_lastname,'@dell.com'));
+	SET @email = (CONCAT(@player_name, '.', @player_lastname, randomizer(1,10000), '@dell.com'));
 	SET @twitter = (CONCAT('@', @player_name, '.', @player_lastname));
 	SET @token = (SELECT UUID());
 	SET @userpass = (SELECT UUID());

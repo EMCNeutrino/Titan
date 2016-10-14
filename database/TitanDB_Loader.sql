@@ -15,8 +15,8 @@
 
 DELETE FROM  item;
 DELETE FROM  penalty;
-DELETE FROM  hero;
 DELETE FROM  heroworldevent;
+DELETE FROM  hero;
 DELETE FROM  worldeventtype;
 DELETE FROM  worldevent;
 
