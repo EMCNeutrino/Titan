@@ -69,7 +69,11 @@ func NewGame(adminToken string) *Game {
 
 // StartGame starts the game
 func StartGame(adminToken string) {
-  game := NewGame(adminToken)
+  // game := NewGame(adminToken)
+  game, err := loadFromDB()
+  if err != nil {
+    log.Panic(err)
+  }
 
   go game.StartEngine()
   game.StartAPI()

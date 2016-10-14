@@ -49,11 +49,25 @@ func saveToDB(g *Game) error {
     if err != nil {
       log.Error(err)
     }
-    rowCnt, err := res.RowsAffected()
+
+    // Update Equipment
+    stmt, err = db.Prepare("INSERT INTO equipment " +
+      "(hero_id, ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots) " +
+      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
+      "ON DUPLICATE KEY UPDATE " +
+      "ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
+      "helm=VALUES(helm), tunic=VALUES(tunic), gloves=VALUES(gloves), shield=VALUES(shield), " +
+      "leggings=VALUES(leggings), boots=VALUES(boots);")
     if err != nil {
       log.Error(err)
     }
-    log.Printf("ID = %d, affected = %d\n", lastID, rowCnt)
+
+    res, err = stmt.Exec(lastID, hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm,
+      hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves,
+      hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
+    if err != nil {
+      log.Error(err)
+    }
   }
 
   return nil
@@ -66,5 +80,45 @@ func loadFromDB() (*Game, error) {
   }
   defer db.Close()
 
-  return nil, nil
+  game := &Game{
+    startedAt:        time.Now(),
+    heroes:           []Hero{},
+    joinChan:         make(chan JoinRequest),
+    activateHeroChan: make(chan ActivateHeroRequest),
+    exitChan:         make(chan []byte),
+    adminToken:       "1234",
+  }
+
+  rows, err := db.Query("SELECT name, email, class, enabled, token, level, ttl, xpos, ypos, " +
+    "IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
+    "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
+    "FROM hero LEFT JOIN equipment ON hero.id=equipment.hero_id")
+  if err != nil {
+    return nil, err
+  }
+  defer rows.Close()
+
+  for rows.Next() {
+    hero := &Hero{
+      Equipment: Equipment{},
+    }
+    var ttl int
+    err := rows.Scan(&hero.Name, &hero.Email, &hero.Class, &hero.Enabled,
+      &hero.token, &hero.Level, &ttl, &hero.Xpos, &hero.Ypos,
+      &hero.Equipment.Ring, &hero.Equipment.Amulet, &hero.Equipment.Charm,
+      &hero.Equipment.Weapon, &hero.Equipment.Helm, &hero.Equipment.Tunic,
+      &hero.Equipment.Gloves, &hero.Equipment.Shield, &hero.Equipment.Leggings,
+      &hero.Equipment.Boots)
+    if err != nil {
+      log.Error(err)
+    }
+    hero.nextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
+    game.heroes = append(game.heroes, *hero)
+  }
+  err = rows.Err()
+  if err != nil {
+    return nil, err
+  }
+
+  return game, nil
 }
