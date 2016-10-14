@@ -48,7 +48,7 @@ CREATE TABLE `hero` (
   `userpass` 		text,
   `energy` 			int(11) DEFAULT NULL,
   `twitter` 		text,
-  `email` 			text,
+  `email` 			VARCHAR(255),
   `title` 			text,
   `race` 			text,
   `isAdmin` 		tinyint(1) DEFAULT NULL,
@@ -62,8 +62,8 @@ CREATE TABLE `hero` (
   `next_level` 		DATETIME DEFAULT NULL,
   `hero_created` 	TIMESTAMP DEFAULT NOW(),
 
-
-  PRIMARY KEY (`hero_id`)
+  PRIMARY KEY (`hero_id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Contains the Hero information';
 
@@ -315,7 +315,7 @@ BEGIN
   SET @hero_name = (SELECT CONCAT(generate_fname(),' ', generate_lname()) as hero_name);
   SET @player_name = (generate_fname());
   SET @player_lastname = (generate_lname());
-  SET @email = (CONCAT(@player_name, '.', @player_lastname,'@dell.com'));
+  SET @email = (CONCAT(@player_name, '.', @player_lastname, randomizer(1,10000),'@dell.com'));
   SET @twitter = (CONCAT('@', @player_name, '.', @player_lastname));
   SET @token = (SELECT UUID());
   SET @userpass = (SELECT UUID());

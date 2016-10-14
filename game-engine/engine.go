@@ -28,6 +28,7 @@ type Game struct {
 }
 
 type Hero struct {
+  id          int64
   Name        string `json:"name"`
   Email       string `json:"email"`
   Class       string `json:"class"`
