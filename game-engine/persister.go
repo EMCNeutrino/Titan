@@ -33,10 +33,10 @@ func saveToDB(g *Game) error {
 
   for _, hero := range g.heroes {
     stmt, err := db.Prepare("INSERT INTO hero " +
-      "(name, email, class, enabled, token, is_admin, level, ttl, xpos, ypos) " +
+      "(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos) " +
       "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
       "ON DUPLICATE KEY UPDATE " +
-      "enabled=VALUES(enabled), level=VALUES(level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos);")
+      "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos);")
     if err != nil {
       log.Error(err)
     }
@@ -51,7 +51,7 @@ func saveToDB(g *Game) error {
     }
 
     // Update Equipment
-    stmt, err = db.Prepare("INSERT INTO equipment " +
+    stmt, err = db.Prepare("INSERT INTO item " +
       "(hero_id, ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots) " +
       "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
       "ON DUPLICATE KEY UPDATE " +
@@ -89,10 +89,10 @@ func loadFromDB() (*Game, error) {
     adminToken:       "1234",
   }
 
-  rows, err := db.Query("SELECT name, email, class, enabled, token, level, ttl, xpos, ypos, " +
+  rows, err := db.Query("SELECT hero_name, email, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
     "IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
     "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
-    "FROM hero LEFT JOIN equipment ON hero.id=equipment.hero_id")
+    "FROM hero LEFT JOIN item ON hero.hero_id=item.hero_id")
   if err != nil {
     return nil, err
   }
