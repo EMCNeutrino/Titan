@@ -73,12 +73,10 @@ func main() {
 		log.Errorln("Database Ping failed: %s", err)
 	}
 
-
-
 	//Find an Item for Hero 1
-	for i := 0; i < 10; i++ {
-
-		Find_item(5, rand.Intn(70), "Gandalf", sqldb)
+	for i := 0; i < 100; i++ {
+		log.Info("Hero # " + strconv.Itoa(i))
+		Find_item(rand.Intn(100)+1, rand.Intn(70), "Gandalf", sqldb)
 	}
 
 
@@ -87,7 +85,7 @@ func main() {
 
 // Find_item generates a new item for the hero when they level up
 // and notifies the player about the item found
-func Find_item(heroID int, hero_level int, hero_name string, sqldb *sql.DB){
+func Find_item(heroID int, hero_level int, hero_name string, conn *sql.DB){
 
 	//log.Info("Find Items called, Hero Level: " + strconv.Itoa(hero_level))
 
@@ -101,6 +99,7 @@ func Find_item(heroID int, hero_level int, hero_name string, sqldb *sql.DB){
 		2.469400931,2.270176369,2.087024703,1.918649217,1.763857808,1.621554549,1.490731931	}
 
 	var item_type int
+	var item_name string
 	var item_level int
 	var item_found_chance float32
 
@@ -120,8 +119,11 @@ func Find_item(heroID int, hero_level int, hero_name string, sqldb *sql.DB){
 			item_gain_percentage := float64(rand.Intn(100))
 			item_level = int(float64(i) + (float64(i) * (item_gain_percentage/100)))
 			item_type = rand.Intn(10)
+			item_name = items[item_type]
 
-			log.Info("Item Found: " + items[item_type] + " | Hero Level: " + strconv.Itoa(hero_level) + " found @ Level: " + strconv.Itoa(i) + " Item Level: " + strconv.Itoa(item_level))
+			var log_msg = "Item Found: " + item_name + " | Hero Level: " + strconv.Itoa(hero_level)+ " found @ Level: " + strconv.Itoa(i)+ " Item Level: " + strconv.Itoa(item_level)
+
+			log.Info(log_msg)
 
 			break
 		}
@@ -129,21 +131,40 @@ func Find_item(heroID int, hero_level int, hero_name string, sqldb *sql.DB){
 
 	//check if No items where found
 
-	var current_item_level = Get_Item_By_HeroID(heroID, items[item_type], sqldb)
+	var current_item_level = Get_Item_By_HeroID(heroID, item_name, conn)
+
+	log.Info("Items: Current: " + strconv.Itoa(current_item_level) + " | New: " + strconv.Itoa(item_level))
+
+	var message string
+	var message_plural string
+
+	if (item_name == items[3] || item_name == items[5] || item_name == items[6]) {
+
+		message_plural =  " are only level "
+
+	} else {
+
+		message_plural =  " is only level "
+	}
 
 	if item_level > current_item_level {
 
 		//Replace the current item value with the new one
+		Update_Item_for_Hero(heroID,item_name, item_level, conn)
 
-		//Message back to player that new item is better
+		message = "You found a level " + strconv.Itoa(item_level) + " " + item_name + "! Your current " + item_name + message_plural +  strconv.Itoa(current_item_level) + ", so it seems Luck is with you!"
 
 	} else {
 
 		//Message back to player that current item level is better
-
+		message = "You found a level " + strconv.Itoa(item_level) + " " + item_name + "! Your current " + item_name + message_plural +  strconv.Itoa(current_item_level) + ", so it seems Luck is against you. You toss the " + item_name + "."
 
 	}
 
+	log.Info(message)
+
+	//Message back to player that new item is better
+	Insert_World_Event_for_Hero(heroID, message, conn)
 
 
 }
@@ -161,26 +182,72 @@ func Get_Item_By_HeroID(heroID int, item_type string, conn *sql.DB) int {
 
 	stmt, err := conn.Prepare(query)
 	if err != nil {
-		log.Errorln("DB: Prepare Query failed: %s", err)
+		log.Errorln("DB: Get_Item_By_HeroID: Prepare Query failed: %s", err)
 	}
 
 	err = stmt.QueryRow(heroID).Scan(&current_item_level)
 
 	if err != nil {
-		log.Errorln("DB: QueryRow failed: %s", err)
+		log.Errorln("DB: Get_Item_By_HeroID: QueryRow failed: %s", err)
 	}
 
 	log.Info("Item Value: " + strconv.Itoa(current_item_level))
 
-	stmt.Close()
+	defer stmt.Close()
 
 	return current_item_level
 }
 
-func Insert_Item_for_Hero(heroID int, item_type string, item_level int, conn *sql.DB) {}
+func Update_Item_for_Hero(heroID int, item_type string, item_level int, conn *sql.DB) {
 
-func Insert_World_Event_for_Hero(heroID int, worldEvent string) {}
+	log.Info("Updating Item: " + item_type + " with Level: " + strconv.Itoa(item_level) +" from Hero ID: " + strconv.Itoa(heroID))
 
+	var query = "UPDATE item SET " + item_type + "=" + strconv.Itoa(item_level) +" WHERE hero_id="+ strconv.Itoa(heroID)
+
+	_, err := conn.Exec(query)
+
+	if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Item Insert failed: %s", err)
+	}
+
+
+	log.Info("Executed: " + query)
+}
+
+func Insert_World_Event_for_Hero(heroID int, worldEvent string, conn *sql.DB) {
+
+	log.Info("Inserting World Event: HeroID: " + strconv.Itoa(heroID) + " | Event: " + worldEvent)
+
+	var query = "INSERT INTO worldevent (event_text) VALUES ('" + worldEvent + "')"
+
+	log.Info("World Event Query: " + query)
+
+	statement, err := conn.Exec(query)
+
+	last_worldevent_Id, err := statement.LastInsertId()
+
+	if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Worldevent Insert failed: %s", err)
+	}
+
+	if last_worldevent_Id != 0 {
+
+		Insert_Hero_World_Event(heroID, int(last_worldevent_Id), conn)
+	}
+}
+
+func Insert_Hero_World_Event(heroID int, woldEvent_id int, conn *sql.DB) {
+
+	var query = "INSERT INTO heroworldevent (hero_id, worldevent_id ) VALUES (" + strconv.Itoa(heroID) + ", " + strconv.Itoa(woldEvent_id) + ")"
+
+	log.Info("Heroworldevent Query: " + query)
+
+	_, err := conn.Exec(query)
+
+	if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Heroworldevent Insert failed: %s", err)
+	}
+}
 
 
 
