@@ -33,41 +33,27 @@ func saveToDB(g *Game) error {
 
   for _, hero := range g.heroes {
     stmt, err := db.Prepare("INSERT INTO hero " +
-      "(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos) " +
-      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
+      "(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
+      " ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
+      ") " +
+      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
       "ON DUPLICATE KEY UPDATE " +
-      "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos);")
-    if err != nil {
-      log.Error(err)
-    }
-    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
-    res, err := stmt.Exec(hero.Name, hero.Email, hero.Class, hero.Enabled, hero.token, false, hero.Level, ttl, hero.Xpos, hero.Ypos)
-    if err != nil {
-      log.Error(err)
-    }
-    lastID, err := res.LastInsertId()
-    if err != nil {
-      log.Error(err)
-    }
-
-    // Update Equipment
-    stmt, err = db.Prepare("INSERT INTO item " +
-      "(hero_id, ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots) " +
-      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
-      "ON DUPLICATE KEY UPDATE " +
+      "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos), " +
       "ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
       "helm=VALUES(helm), tunic=VALUES(tunic), gloves=VALUES(gloves), shield=VALUES(shield), " +
       "leggings=VALUES(leggings), boots=VALUES(boots);")
     if err != nil {
       log.Error(err)
     }
-
-    res, err = stmt.Exec(lastID, hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm,
+    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
+    _, err = stmt.Exec(hero.Name, hero.Email, hero.Class, hero.Enabled, hero.token, false, hero.Level, ttl, hero.Xpos, hero.Ypos,
+      hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm,
       hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves,
       hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
     if err != nil {
       log.Error(err)
     }
+
   }
 
   return nil
@@ -92,7 +78,7 @@ func loadFromDB() (*Game, error) {
   rows, err := db.Query("SELECT hero_name, email, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
     "IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
     "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
-    "FROM hero LEFT JOIN item ON hero.hero_id=item.hero_id")
+    "FROM hero")
   if err != nil {
     return nil, err
   }
