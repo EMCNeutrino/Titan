@@ -21,11 +21,8 @@ CREATE USER IF NOT EXISTS 'titanuser'@localhost IDENTIFIED BY 'Neutrin0R0cks!';
 GRANT ALL ON titandb.* TO 'titanuser' IDENTIFIED BY 'Neutrin0R0cks!';
 
 USE titandb;
-GO
 
 # Drop Tables
-DROP TABLE IF EXISTS item;
-DROP TABLE IF EXISTS penalty;
 DROP TABLE IF EXISTS heroworldevent;
 DROP TABLE IF EXISTS hero;
 DROP TABLE IF EXISTS worldeventtype;
@@ -34,79 +31,43 @@ DROP TABLE IF EXISTS worldevent;
 #Drop Functions
 DROP FUNCTION IF EXISTS randomizer;
 
-
-
 # Tables
-
 CREATE TABLE `hero` (
 
-  `hero_id` 		int(11) NOT NULL AUTO_INCREMENT,
-  `hero_name` 		text,
-  `player_name` 	text,
-  `player_lastname` text,
-  `token` 			text,
-  `userpass` 		text,
-  `energy` 			int(11) DEFAULT NULL,
-  `twitter` 		text,
-  `email` 			VARCHAR(255),
-  `title` 			text,
-  `race` 			text,
-  `isAdmin` 		tinyint(1) DEFAULT NULL,
-  `hero_level` 		int(11) DEFAULT NULL,
-  `hclass` 			text,
-  `ttl` 			int(11) DEFAULT NULL,
-  `userhost` 		text,
-  `hero_online` 	tinyint(1) DEFAULT NULL,
-  `xpos` 			int(11) DEFAULT NULL,
-  `ypos` 			int(11) DEFAULT NULL,
-  `next_level` 		DATETIME DEFAULT NULL,
-  `hero_created` 	TIMESTAMP DEFAULT NOW(),
-
+  `hero_id` int(11) NOT NULL AUTO_INCREMENT,
+  `hero_name` varchar(255) DEFAULT NULL,
+  `player_name` varchar(255) DEFAULT NULL,
+  `player_lastname` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `twitter` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `race` varchar(255) DEFAULT NULL,
+  `isAdmin` tinyint(1) DEFAULT NULL,
+  `hero_level` int(11) DEFAULT NULL,
+  `hclass` varchar(255) DEFAULT NULL,
+  `ttl` int(11) DEFAULT NULL,
+  `userhost` varchar(255) DEFAULT NULL,
+  `hero_online` tinyint(1) DEFAULT NULL,
+  `xpos` int(11) DEFAULT NULL,
+  `ypos` int(11) DEFAULT NULL,
+  `next_level` datetime DEFAULT NULL,
+  `weapon` int(11) DEFAULT NULL,
+  `tunic` int(11) DEFAULT NULL,
+  `shield` int(11) DEFAULT NULL,
+  `leggings` int(11) DEFAULT NULL,
+  `ring` int(11) DEFAULT NULL,
+  `gloves` int(11) DEFAULT NULL,
+  `boots` int(11) DEFAULT NULL,
+  `helm` int(11) DEFAULT NULL,
+  `charm` int(11) DEFAULT NULL,
+  `amulet` int(11) DEFAULT NULL,
+  `total_equipment` int(11) DEFAULT NULL,
+  `hero_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`hero_id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-
+  
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Contains the Hero information';
-
-CREATE TABLE `item` (
-
-  `item_id` int(11) NOT NULL AUTO_INCREMENT,
-  `hero_id` int(11) DEFAULT NULL,
-  `weapon` 	int(11) DEFAULT NULL,
-  `tunic` 	int(11) DEFAULT NULL,
-  `shield` 	int(11) DEFAULT NULL,
-  `leggings` int(11) DEFAULT NULL,
-  `ring` 	int(11) DEFAULT NULL,
-  `gloves` 	int(11) DEFAULT NULL,
-  `boots` 	int(11) DEFAULT NULL,
-  `energy` 	int(11) DEFAULT NULL,
-  `helm` 	int(11) DEFAULT NULL,
-  `charm` 	int(11) DEFAULT NULL,
-  `amulet` 	int(11) DEFAULT NULL,
-  `total` 	int(11) DEFAULT NULL,
-
-  PRIMARY KEY (`item_id`),
-  KEY `item_hero_hero_id_fk` (`hero_id`),
-
-  CONSTRAINT `item_hero_hero_id_fk` FOREIGN KEY (`hero_id`) REFERENCES `hero` (`hero_id`)
-
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Holds  the items owned by the hero';
-
-CREATE TABLE `penalty` (
-
-  `penalty_id` 	int(11) NOT NULL AUTO_INCREMENT,
-  `hero_id` 	int(11) DEFAULT NULL,
-  `logout` 		int(11) DEFAULT NULL,
-  `quit` 		int(11) DEFAULT NULL,
-  `message` 	int(11) DEFAULT NULL,
-  `quest` 		int(11) DEFAULT NULL,
-
-  PRIMARY KEY (`penalty_id`),
-  KEY `penalty_hero_hero_id_fk` (`hero_id`),
-
-  CONSTRAINT `penalty_hero_hero_id_fk` FOREIGN KEY (`hero_id`) REFERENCES `hero` (`hero_id`)
-
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Penalties table stores the penalties accumulated by a hero';
-
 
 CREATE TABLE `worldeventtype` (
   `idworldeventtype_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -121,10 +82,12 @@ INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Calamity");
 INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Quest");
 INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Creep");
 INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Moster");
+INSERT INTO `titandb`.`worldeventtype` (`type_text`) VALUES ("Item");
 
 
 CREATE TABLE `worldevent` (
   `worldevent_id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_type` VARCHAR(255),
   `event_text` text,
   `event_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`worldevent_id`)
@@ -301,9 +264,6 @@ DELIMITER ;
 
 
 # Stored Procedures
-
-
-
 DROP PROCEDURE IF EXISTS hero_insert;
 
 DELIMITER $$
@@ -326,14 +286,13 @@ BEGIN
 
 #SELECT @hero_level, @next_level_calc, @next_level_calc2, (Now()), @next_level;
 
+
 INSERT INTO `titandb`.`hero`
 (
   `hero_name`,
   `player_name`,
   `player_lastname`,
   `token`,
-  `userpass`,
-  `energy`,
   `twitter`,
   `email`,
   `title`,
@@ -346,8 +305,18 @@ INSERT INTO `titandb`.`hero`
   `hero_online`,
   `xpos`,
   `ypos`,
-  `next_level`
-
+  `next_level`,
+	weapon,
+    tunic,
+    shield,
+    leggings,
+    ring,
+    gloves,
+    boots,
+    helm,
+    charm,
+    amulet,
+    total_equipment
 )
 
 VALUES
@@ -357,8 +326,6 @@ VALUES
   @player_name,
   @player_lastname,
   @token,
-  @userpass,
-  randomizer(1,100),
   @twitter,
   @email,
   generate_title(),
@@ -371,8 +338,19 @@ VALUES
   1,
   randomizer(1,100),
   randomizer(1,100),
-  @next_level
-
+  @next_level,
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  randomizer(1,100),
+  0
+  
 );
 
 SET @heroid = NULL;
@@ -382,68 +360,11 @@ SET @total_items = NULL;
 
 SET @heroid = (SELECT hero_id FROM hero WHERE token = @token);
 
-#Insert into Penalty Table
-
-INSERT INTO penalty (
-
-    hero_id,
-    logout,
-    quit,
-    message,
-    quest
-
-) VALUES (
-
-    @heroid,
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100)
-
-);
-
-#insert into the Item Table
-
-INSERT INTO item (
-
-    hero_id,
-    weapon,
-    tunic,
-    shield,
-    leggings,
-    ring,
-    gloves,
-    boots,
-    energy,
-    helm,
-    charm,
-    Amulet,
-    Total
-
-) VALUES (
-
-    @heroid,
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    randomizer(1,100),
-    0
-);
 
 # Calculate Total Items for Gandalf
-SET @total_items = (SELECT  weapon + tunic + shield +
-                           leggings + ring + gloves + boots +
-                           energy + helm + charm + Amulet
-                     FROM item WHERE hero_id = @heroid);
+SET @total_items = (SELECT  weapon + tunic + shield + leggings + ring + gloves + boots + helm + charm + Amulet FROM hero WHERE hero_id = @heroid);
 
-UPDATE item SET Total = @total_items WHERE hero_id = @heroid;
+UPDATE hero SET total_equipment = @total_items WHERE hero_id = @heroid;
 
 
 

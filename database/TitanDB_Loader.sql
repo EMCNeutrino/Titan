@@ -13,15 +13,12 @@
 ** 2    10/04/2016 PBM       Updated with Stored Procedure Generator
 *******************************/
 
-DELETE FROM  item;
-DELETE FROM  penalty;
-DELETE FROM  hero;
+
 DELETE FROM  heroworldevent;
+DELETE FROM  hero;
 DELETE FROM  worldeventtype;
 DELETE FROM  worldevent;
 
-ALTER TABLE item AUTO_INCREMENT = 1;
-ALTER TABLE penalty AUTO_INCREMENT = 1;
 ALTER TABLE hero AUTO_INCREMENT = 1;
 ALTER TABLE heroworldevent AUTO_INCREMENT = 1;
 ALTER TABLE worldeventtype AUTO_INCREMENT = 1;
@@ -31,5 +28,4 @@ ALTER TABLE worldevent AUTO_INCREMENT = 1;
 Call create_heros(10);
 
 SELECT * FROM hero;
-SELECT * FROM penalty;
 SELECT * FROM item;
