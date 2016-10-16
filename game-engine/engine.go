@@ -20,7 +20,7 @@ const (
 
 type Game struct {
   startedAt        time.Time
-  heroes           []Hero
+  heroes           []HeroDB
   adminToken       string
   joinChan         chan JoinRequest
   activateHeroChan chan ActivateHeroRequest
@@ -59,7 +59,7 @@ type Equipment struct {
 func NewGame(adminToken string) *Game {
   game := &Game{
     startedAt:        time.Now(),
-    heroes:           []Hero{},
+    heroes:           []HeroDB{},
     joinChan:         make(chan JoinRequest),
     activateHeroChan: make(chan ActivateHeroRequest),
     exitChan:         make(chan []byte),
@@ -71,7 +71,7 @@ func NewGame(adminToken string) *Game {
 // StartGame starts the game
 func StartGame(adminToken string) {
   // game := NewGame(adminToken)
-  game, err := loadFromDB()
+  game, err := LoadFromDB()
   if err != nil {
     log.Panic(err)
   }
@@ -93,7 +93,7 @@ func (g *Game) StartEngine() {
       //TODO: check battles
     case <-tickerDB.C:
       log.Info("Saving game state to DB")
-      if err := saveToDB(g); err != nil {
+      if err := SaveToDB(g); err != nil {
         log.Error(err)
       }
     case req := <-g.joinChan:
@@ -120,34 +120,32 @@ func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
     return false, "You are not authorized to perform this action."
   }
 
-  hero := &Hero{
-    Name:        name,
+  hero := &HeroDB{
+    HeroName:        name,
     Email:       email,
-    Class:       class,
+    HClass:       class,
     Enabled:     false,
-    token:       randToken(),
+    Token:       randToken(),
     Level:       0,
-    nextLevelAt: time.Now().Add(99999 * time.Hour),
-    createdAt:   time.Now(),
-    Equipment: Equipment{
-      Ring:     0,
-      Amulet:   0,
-      Charm:    0,
-      Weapon:   0,
-      Helm:     0,
-      Tunic:    0,
-      Gloves:   0,
-      Shield:   0,
-      Leggings: 0,
-      Boots:    0,
-    },
+    NextLevelAt: time.Now().Add(99999 * time.Hour),
+    HeroCreatedAt:   time.Now(),
+    Ring:     0,
+    Amulet:   0,
+    Charm:    0,
+    Weapon:   0,
+    Helm:     0,
+    Tunic:    0,
+    Gloves:   0,
+    Shield:   0,
+    Leggings: 0,
+    Boots:    0,
     Xpos: rand.Intn(xMax-xMin) + xMin,
     Ypos: rand.Intn(yMax-yMin) + yMin,
   }
 
   g.heroes = append(g.heroes, *hero)
-  log.Infof("Hero %s has been created, but will not play until it's activated.", hero.Name)
-  return true, fmt.Sprintf("Token: %s", hero.token)
+  log.Infof("Hero %s has been created, but will not play until it's activated.", hero.HeroName)
+  return true, fmt.Sprintf("Token: %s", hero.Token)
 }
 
 func (g *Game) activateHero(name, token string) bool {
@@ -155,14 +153,14 @@ func (g *Game) activateHero(name, token string) bool {
   if i == -1 {
     return false
   }
-  if g.heroes[i].token != token {
+  if g.heroes[i].Token != token {
     return false
   }
 
   ttl := getTTL(1) // Time to level 1
   g.heroes[i].Enabled = true
-  g.heroes[i].nextLevelAt = time.Now().Add(ttl * time.Second)
-  log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].Name, ttl)
+  g.heroes[i].NextLevelAt = time.Now().Add(ttl * time.Second)
+  log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
   return true
 }
 
@@ -182,12 +180,12 @@ func (g *Game) checkLevels() {
       continue
     }
 
-    if g.heroes[i].nextLevelAt.Before(time.Now()) {
+    if g.heroes[i].NextLevelAt.Before(time.Now()) {
       level := g.heroes[i].Level + 1
       ttl := getTTL(level + 1)
-      g.heroes[i].nextLevelAt = time.Now().Add(ttl * time.Second)
+      g.heroes[i].NextLevelAt = time.Now().Add(ttl * time.Second)
       g.heroes[i].Level = level
-      log.Infof("Hero %s reached level %d. Next level in %d seconds.", g.heroes[i].Name, level, ttl)
+      log.Infof("Hero %s reached level %d. Next level in %d seconds.", g.heroes[i].HeroName, level, ttl)
     }
   }
 }
@@ -198,7 +196,7 @@ func (g *Game) authorizeAdmin(token string) bool {
 
 func (g *Game) getHeroIndex(name string) int {
   for i, hero := range g.heroes {
-    if hero.Name == name {
+    if hero.HeroName == name {
       return i
     }
   }

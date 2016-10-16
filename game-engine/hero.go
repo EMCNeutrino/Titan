@@ -16,25 +16,24 @@ type HeroDB struct {
 	IsAdmin  	bool	`json:"isadmin"`
 	Level    	int	`json:"herolevel"`
 	HClass   	string	`json:"heroclass"`
-	TTL      	int64	`json:"TTL"`
+	TTL      	int	`json:"TTL"`
 	Userhost 	string	`json:"userhost"`
-	Online   	bool	`json:"online"`
-	Xpos		int64	`json:"xpos"`
-	Ypos		int64	`json:"ypos"`
-	NextLevel	time.Time  `json:"nextlevel"`
-	ItemID   int64  `json:"int64"`
-	Weapon   int64	`json:"weapon"`
-	Tunic    int64	`json:"tunic"`
-	Shield   int64	`json:"shield"`
-	Leggings int64	`json:"leggings"`
-	Ring     int64	`json:"ring"`
-	Gloves   int64	`json:"gloves"`
-	Boots    int64	`json:"boots"`
-	Energy   int64	`json:"energy"`
-	Helm	 int64	`json:"helm"`
-	Charm	 int64	`json:"charm"`
-	Amulet	 int64	`json:"amulet"`
-	TotalEquipment	 int64	`json:"totalequipment"`
+	Enabled   	bool	`json:"enabled"`
+	Xpos		int	`json:"xpos"`
+	Ypos		int	`json:"ypos"`
+	NextLevelAt	time.Time  `json:"nextlevelat"`
+	Weapon   int	`json:"weapon"`
+	Tunic    int	`json:"tunic"`
+	Shield   int	`json:"shield"`
+	Leggings int	`json:"leggings"`
+	Ring     int	`json:"ring"`
+	Gloves   int	`json:"gloves"`
+	Boots    int	`json:"boots"`
+	Helm	 int	`json:"helm"`
+	Charm	 int	`json:"charm"`
+	Amulet	 int	`json:"amulet"`
+	TotalEquipment	 int	`json:"totalequipment"`
+	HeroCreatedAt	time.Time  `json:"herocreatedat"`
 }
 
 type WorldEvent struct {

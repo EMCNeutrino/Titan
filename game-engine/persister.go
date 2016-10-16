@@ -1,110 +1,148 @@
 package main
 
 import (
-  "database/sql"
-  "time"
+	"database/sql"
+	"time"
 
-  log "github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 
-  _ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
+	"encoding/json"
+
 )
 
 func getDBConnection() (*sql.DB, error) {
-  db, err := sql.Open("mysql", "root:root@/titandb")
-  if err != nil {
-    return nil, err
-  }
+	db, err := sql.Open("mysql", "titanuser:Neutrin0R0cks!@/titandb")
+	if err != nil {
+		return nil, err
+	}
 
-  err = db.Ping()
-  if err != nil {
-    db.Close()
-    return nil, err
-  }
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
 
-  return db, nil
+	return db, nil
 }
 
-func saveToDB(g *Game) error {
-  db, err := getDBConnection()
-  if err != nil {
-    return err
-  }
-  defer db.Close()
+func SaveToDB(g *Game) error {
 
-  for _, hero := range g.heroes {
-    stmt, err := db.Prepare("INSERT INTO hero " +
-      "(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
-      " ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
-      ") " +
-      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
-      "ON DUPLICATE KEY UPDATE " +
-      "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos), " +
-      "ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
-      "helm=VALUES(helm), tunic=VALUES(tunic), gloves=VALUES(gloves), shield=VALUES(shield), " +
-      "leggings=VALUES(leggings), boots=VALUES(boots);")
-    if err != nil {
-      log.Error(err)
-    }
-    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
-    _, err = stmt.Exec(hero.Name, hero.Email, hero.Class, hero.Enabled, hero.token, false, hero.Level, ttl, hero.Xpos, hero.Ypos,
-      hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm,
-      hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves,
-      hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
-    if err != nil {
-      log.Error(err)
-    }
+	log.Info("[Persister] SaveToDB Called ------------------------------------------------------- ")
+	db, err := getDBConnection()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
 
-  }
+	for _, hero := range g.heroes {
+		stmt, err := db.Prepare("INSERT INTO hero " +
+			"(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
+			" ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
+			") " +
+			"VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
+			"ON DUPLICATE KEY UPDATE " +
+			"hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos), " +
+			"ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
+			"helm=VALUES(helm), tunic=VALUES(tunic), gloves=VALUES(gloves), shield=VALUES(shield), " +
+			"leggings=VALUES(leggings), boots=VALUES(boots);")
+		if err != nil {
+			log.Error(err)
+		}
+		ttl := int(hero.NextLevelAt.Sub(time.Now()).Seconds())
 
-  return nil
+		_, err = stmt.Exec(hero.HeroName, hero.Email, hero.HClass, hero.Enabled, hero.Token, false, hero.Level, ttl, hero.Xpos, hero.Ypos,
+			hero.Ring, hero.Amulet, hero.Charm, hero.Weapon, hero.Helm, hero.Tunic, hero.Gloves, hero.Shield, hero.Leggings, hero.Boots)
+		if err != nil {
+			log.Error(err)
+		}
+
+	}
+
+	return nil
 }
 
-func loadFromDB() (*Game, error) {
-  db, err := getDBConnection()
-  if err != nil {
-    return nil, err
-  }
-  defer db.Close()
+func LoadFromDB() (*Game, error) {
 
-  game := &Game{
-    startedAt:        time.Now(),
-    heroes:           []Hero{},
-    joinChan:         make(chan JoinRequest),
-    activateHeroChan: make(chan ActivateHeroRequest),
-    exitChan:         make(chan []byte),
-    adminToken:       "1234",
-  }
+	log.Info("[Persister] LoadFromDB Called ------------------------------------------------------- ")
 
-  rows, err := db.Query("SELECT hero_name, email, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
-    "IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
-    "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
-    "FROM hero")
-  if err != nil {
-    return nil, err
-  }
-  defer rows.Close()
+	db, err := getDBConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
 
-  for rows.Next() {
-    hero := &Hero{
-      Equipment: Equipment{},
-    }
-    var ttl int
-    err := rows.Scan(&hero.Name, &hero.Email, &hero.Class, &hero.Enabled,
-      &hero.token, &hero.Level, &ttl, &hero.Xpos, &hero.Ypos,
-      &hero.Equipment.Ring, &hero.Equipment.Amulet, &hero.Equipment.Charm,
-      &hero.Equipment.Weapon, &hero.Equipment.Helm, &hero.Equipment.Tunic,
-      &hero.Equipment.Gloves, &hero.Equipment.Shield, &hero.Equipment.Leggings,
-      &hero.Equipment.Boots)
-    if err != nil {
-      log.Error(err)
-    }
-    hero.nextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
-    game.heroes = append(game.heroes, *hero)
-  }
-  err = rows.Err()
-  if err != nil {
-    return nil, err
-  }
+	game := &Game{
+		startedAt:        time.Now(),
+		heroes:           []HeroDB{},
+		joinChan:         make(chan JoinRequest),
+		activateHeroChan: make(chan ActivateHeroRequest),
+		exitChan:         make(chan []byte),
+		adminToken:       "1234",
+	}
 
-  return game, nil
+	/*
+	rows, err := db.Query("SELECT hero_name, player_name, player_lastname, email, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
+		"IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
+	  "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
+	  "FROM hero")
+	*/
+
+
+	rows, err := db.Query("SELECT hero_id, hero_name, player_name, player_lastname, token, twitter, email, title, race, isadmin, " +
+		"hero_level,  hclass, ttl, userhost, hero_online, xpos, ypos, " +
+		"IFNULL(weapon, 0), IFNULL(tunic, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(ring, 0), " +
+		"IFNULL(gloves, 0), IFNULL(boots, 0), IFNULL(helm, 0), IFNULL(charm, 0) , IFNULL(amulet, 0) " +
+		"total_equipment FROM hero")
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		hero := &HeroDB{}
+		var ttl int
+
+		err := rows.Scan(&hero.HeroID, &hero.HeroName, &hero.UserName, &hero.UserLastName, &hero.Token, &hero.Twitter, &hero.Email,
+			&hero.Title, &hero.HRace, &hero.IsAdmin, &hero.Level, &hero.HClass, &ttl, &hero.Userhost, &hero.Enabled,
+			&hero.Xpos, &hero.Ypos, &hero.Weapon, &hero.Tunic, &hero.Shield, &hero.Leggings, &hero.Ring, &hero.Gloves,
+			&hero.Boots, &hero.Helm, &hero.Charm, &hero.Amulet)
+
+		if err != nil {
+			log.Error(err)
+		}
+
+		hero.TotalEquipment = hero.Weapon + hero.Tunic + hero.Shield + hero.Leggings + hero.Ring + hero.Gloves + hero.Boots + hero.Helm + hero.Charm + hero.Amulet
+		hero.NextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
+		game.heroes = append(game.heroes, *hero)
+
+		hero2json, _ := json.Marshal(hero)
+		log.Info(string(hero2json))
+
+		Hero_Joined_World_Notification(hero, db)
+
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
+func Hero_Joined_World_Notification(hero *HeroDB, conn *sql.DB) {
+
+	log.Info("[Persister] Hero_Joined_World_Notification Called ------------------------------------------------------- ")
+
+
+	var message = hero.HeroName + ", " + hero.Title + ", is now online from " + hero.UserName +
+		" " + hero.UserLastName + "(" + hero.Twitter + "). Next Level in " + hero.NextLevelAt.String()
+
+	log.Info(message)
+
+	Insert_World_Event_for_Hero(hero.HeroID, message, conn)
+
+
+
 }
