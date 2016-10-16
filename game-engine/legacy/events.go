@@ -72,6 +72,4 @@ good_events[24] = " was notified that Jenkins tests passed"
 good_events[25] = " got his first patch +4 approved in OpenStack"
 good_events[26] = " got a HEAT template successfully deployed"
 
-
-
 */
