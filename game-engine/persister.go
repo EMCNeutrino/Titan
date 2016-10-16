@@ -81,16 +81,16 @@ func LoadFromDB() (*Game, error) {
 		adminToken:       "1234",
 	}
 
-	/*
-	rows, err := db.Query("SELECT hero_name, player_name, player_lastname, email, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
-		"IFNULL(ring, 0), IFNULL(amulet, 0), IFNULL(charm, 0), IFNULL(weapon, 0), IFNULL(helm, 0), " +
-	  "IFNULL(tunic, 0), IFNULL(gloves, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(boots, 0) " +
-	  "FROM hero")
-	*/
-
-
-	rows, err := db.Query("SELECT hero_id, hero_name, player_name, player_lastname, token, twitter, email, title, race, isadmin, " +
-		"hero_level,  hclass, ttl, userhost, hero_online, xpos, ypos, " +
+	rows, err := db.Query("SELECT hero_id, COALESCE(hero_name, '') AS hero_name, COALESCE(player_name, '') AS player_name," +
+		"COALESCE(player_lastname, '') AS player_lastname, " +
+		"COALESCE(token, '') AS token, " +
+		"COALESCE(twitter, '') AS twiter, " +
+		"COALESCE(email, 'NoEmail') AS email, " +
+		"COALESCE(title, '') AS title, " +
+		"COALESCE(race, '') AS race, " +
+		"isadmin, hero_level,  " +
+		"COALESCE(hclass, '') AS hclass , ttl, " +
+		"COALESCE(userhost, '') AS userhost, hero_online, xpos, ypos, " +
 		"IFNULL(weapon, 0), IFNULL(tunic, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(ring, 0), " +
 		"IFNULL(gloves, 0), IFNULL(boots, 0), IFNULL(helm, 0), IFNULL(charm, 0) , IFNULL(amulet, 0) " +
 		"total_equipment FROM hero")
@@ -115,12 +115,16 @@ func LoadFromDB() (*Game, error) {
 
 		hero.TotalEquipment = hero.Weapon + hero.Tunic + hero.Shield + hero.Leggings + hero.Ring + hero.Gloves + hero.Boots + hero.Helm + hero.Charm + hero.Amulet
 		hero.NextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
-		game.heroes = append(game.heroes, *hero)
 
-		hero2json, _ := json.Marshal(hero)
-		log.Info(string(hero2json))
+		if(hero.HeroName != "") {  //Fixes the extra record with empty information.
 
-		Hero_Joined_World_Notification(hero, db)
+			game.heroes = append(game.heroes, *hero)
+
+			hero2json, _ := json.Marshal(hero)
+			log.Info(string(hero2json))
+
+			Hero_Joined_World_Notification(hero, db)
+		}
 
 	}
 	err = rows.Err()
