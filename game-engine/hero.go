@@ -4,40 +4,39 @@ import "time"
 
 // Hero struct contains information about each Hero
 type Hero struct {
-  HeroID         int64     `json:"heroid"`
-  FirstName      string    `json:"username"`
-  LastName       string    `json:"userlastname"`
-  HeroName       string    `json:"heroname"`
-  Token          string    `json:"token"`
-  Twitter        string    `json:"twitter"`
-  Email          string    `json:"email"`
-  Title          string    `json:"title"`
-  HRace          string    `json:"herorace"`
-  IsAdmin        bool      `json:"isadmin"`
-  Level          int       `json:"herolevel"`
-  HeroClass      string    `json:"heroclass"`
-  TTL            int       `json:"TTL"`
-  Userhost       string    `json:"userhost"`
-  Enabled        bool      `json:"enabled"`
-  Xpos           int       `json:"xpos"`
-  Ypos           int       `json:"ypos"`
-  NextLevelAt    time.Time `json:"nextlevelat"`
-  Weapon         int       `json:"weapon"`
-  Tunic          int       `json:"tunic"`
-  Shield         int       `json:"shield"`
-  Leggings       int       `json:"leggings"`
-  Ring           int       `json:"ring"`
-  Gloves         int       `json:"gloves"`
-  Boots          int       `json:"boots"`
-  Helm           int       `json:"helm"`
-  Charm          int       `json:"charm"`
-  Amulet         int       `json:"amulet"`
-  TotalEquipment int       `json:"totalequipment"`
-  HeroCreatedAt  time.Time `json:"herocreatedat"`
+  id          int64
+  FirstName   string `json:"first_name"`
+  LastName    string `json:"last_name"`
+  Email       string `json:"email"`
+  Twitter     string `json:"twitter"`
+  HeroName    string `json:"hero_name"`
+  HeroClass   string `json:"hero_class"`
+  Enabled     bool   `json:"enabled"`
+  TTL         int    `json:"ttl"`
+  token       string
+  Level       int `json:"level"`
+  nextLevelAt time.Time
+  CreatedAt   time.Time  `json:"created_at"`
+  Equipment   *Equipment `json:"equipment"`
+  Xpos        int        `json:"x_pos"`
+  Ypos        int        `json:"y_pos"`
+}
+
+type Equipment struct {
+  Ring     int `json:"ring"`
+  Amulet   int `json:"amulet"`
+  Charm    int `json:"charm"`
+  Weapon   int `json:"weapon"`
+  Helm     int `json:"helm"`
+  Tunic    int `json:"tunic"`
+  Gloves   int `json:"gloves"`
+  Shield   int `json:"shield"`
+  Leggings int `json:"leggings"`
+  Boots    int `json:"boots"`
+  Total    int `json:"total"`
 }
 
 type Event struct {
-  ID   int64
   Type string    `json:"type"`
   Text string    `json:"text"`
   Time time.Time `json:"time"`
@@ -46,25 +45,25 @@ type Event struct {
 func (h *Hero) getItemLevel(itemType string) int {
   switch itemType {
   case "weapon":
-    return h.Weapon
+    return h.Equipment.Weapon
   case "tunic":
-    return h.Tunic
+    return h.Equipment.Tunic
   case "shield":
-    return h.Shield
+    return h.Equipment.Shield
   case "leggings":
-    return h.Leggings
+    return h.Equipment.Leggings
   case "ring":
-    return h.Ring
+    return h.Equipment.Ring
   case "gloves":
-    return h.Gloves
+    return h.Equipment.Gloves
   case "boots":
-    return h.Boots
+    return h.Equipment.Boots
   case "helm":
-    return h.Helm
+    return h.Equipment.Helm
   case "charm":
-    return h.Charm
+    return h.Equipment.Charm
   case "amulet":
-    return h.Amulet
+    return h.Equipment.Amulet
   }
   return -1
 }
@@ -73,28 +72,28 @@ func (h *Hero) getItemLevel(itemType string) int {
 func (h *Hero) updateItem(itemType string, itemLevel int) {
   switch itemType {
   case "weapon":
-    h.Weapon = itemLevel
+    h.Equipment.Weapon = itemLevel
   case "tunic":
-    h.Tunic = itemLevel
+    h.Equipment.Tunic = itemLevel
   case "shield":
-    h.Shield = itemLevel
+    h.Equipment.Shield = itemLevel
   case "leggings":
-    h.Leggings = itemLevel
+    h.Equipment.Leggings = itemLevel
   case "ring":
-    h.Ring = itemLevel
+    h.Equipment.Ring = itemLevel
   case "gloves":
-    h.Gloves = itemLevel
+    h.Equipment.Gloves = itemLevel
   case "boots":
-    h.Boots = itemLevel
+    h.Equipment.Boots = itemLevel
   case "helm":
-    h.Helm = itemLevel
+    h.Equipment.Helm = itemLevel
   case "charm":
-    h.Charm = itemLevel
+    h.Equipment.Charm = itemLevel
   case "amulet":
-    h.Amulet = itemLevel
+    h.Equipment.Amulet = itemLevel
   }
 }
 
 func (h *Hero) getTTL() int {
-  return int(h.NextLevelAt.Sub(time.Now()).Seconds())
+  return int(h.nextLevelAt.Sub(time.Now()).Seconds())
 }

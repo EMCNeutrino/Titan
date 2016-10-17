@@ -78,6 +78,7 @@ func (api *API) heroGet(c *gin.Context) {
   }
 
   hero.TTL = hero.getTTL()
+  hero.Equipment.Total = hero.Equipment.Weapon + hero.Equipment.Tunic + hero.Equipment.Shield + hero.Equipment.Leggings + hero.Equipment.Ring + hero.Equipment.Gloves + hero.Equipment.Boots + hero.Equipment.Helm + hero.Equipment.Charm + hero.Equipment.Amulet
   c.JSON(http.StatusOK, hero)
 }
 
@@ -113,7 +114,7 @@ func (api *API) heroEvents(c *gin.Context) {
     return
   }
 
-  events, err := api.game.GetEventsForHeroFromDB(hero.HeroID)
+  events, err := api.game.GetEventsForHeroFromDB(hero.id)
   if err != nil {
     c.String(http.StatusNotFound, "Could not get Hero events")
     return

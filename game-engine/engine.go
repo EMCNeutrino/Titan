@@ -108,34 +108,37 @@ func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass
   }
 
   hero := &Hero{
-    FirstName:     firstName,
-    LastName:      lastName,
-    Email:         email,
-    Twitter:       twitter,
-    HeroName:      heroName,
-    HeroClass:     heroClass,
-    Enabled:       false,
-    Token:         randToken(),
-    Level:         0,
-    NextLevelAt:   ttlToDatetime(99999 * time.Hour),
-    HeroCreatedAt: time.Now(),
-    Ring:          0,
-    Amulet:        0,
-    Charm:         0,
-    Weapon:        0,
-    Helm:          0,
-    Tunic:         0,
-    Gloves:        0,
-    Shield:        0,
-    Leggings:      0,
-    Boots:         0,
-    Xpos:          rand.Intn(xMax-xMin) + xMin,
-    Ypos:          rand.Intn(yMax-yMin) + yMin,
+    FirstName:   firstName,
+    LastName:    lastName,
+    Email:       email,
+    Twitter:     twitter,
+    HeroName:    heroName,
+    HeroClass:   heroClass,
+    Enabled:     false,
+    token:       randToken(),
+    Level:       0,
+    nextLevelAt: ttlToDatetime(99999 * time.Hour),
+    CreatedAt:   time.Now(),
+    Equipment: &Equipment{
+      Ring:     0,
+      Amulet:   0,
+      Charm:    0,
+      Weapon:   0,
+      Helm:     0,
+      Tunic:    0,
+      Gloves:   0,
+      Shield:   0,
+      Leggings: 0,
+      Boots:    0,
+      Total:    0,
+    },
+    Xpos: rand.Intn(xMax-xMin) + xMin,
+    Ypos: rand.Intn(yMax-yMin) + yMin,
   }
 
   g.heroes = append(g.heroes, *hero)
   log.Infof("Hero %s has been created, but will not play until it's activated.", hero.HeroName)
-  return true, fmt.Sprintf("Token: %s", hero.Token)
+  return true, fmt.Sprintf("Token: %s", hero.token)
 }
 
 func (g *Game) activateHero(name, token string) bool {
@@ -144,12 +147,12 @@ func (g *Game) activateHero(name, token string) bool {
   if i == -1 {
     return false
   }
-  if g.heroes[i].Token != token {
+  if g.heroes[i].token != token {
     return false
   }
 
   ttl := getTTLForLevel(1) // Time to level 1
-  g.heroes[i].NextLevelAt = ttlToDatetime(ttl)
+  g.heroes[i].nextLevelAt = ttlToDatetime(ttl)
   g.heroes[i].Enabled = true
   log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
   return true
@@ -212,10 +215,10 @@ func (g *Game) checkLevels() {
       continue
     }
 
-    if g.heroes[i].NextLevelAt.Before(time.Now()) {
+    if g.heroes[i].nextLevelAt.Before(time.Now()) {
       level := g.heroes[i].Level + 1
       ttl := getTTLForLevel(level + 1)
-      g.heroes[i].NextLevelAt = ttlToDatetime(ttl)
+      g.heroes[i].nextLevelAt = ttlToDatetime(ttl)
       g.heroes[i].Level = level
 
       message := fmt.Sprintf("%s has attained level %d! Next level in %d seconds.", g.heroes[i].HeroName, level, ttl)

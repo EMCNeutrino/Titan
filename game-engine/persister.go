@@ -37,10 +37,10 @@ func SaveToDB(g *Game) error {
 
   for _, hero := range g.heroes {
     stmt, err := db.Prepare("INSERT INTO hero " +
-      "(player_name, player_lastname, hero_name, email, twitter, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
+      "(player_name, player_lastname, hero_name, email, twitter, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
       " ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
       ") " +
-      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
+      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
       "ON DUPLICATE KEY UPDATE " +
       "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos), " +
       "ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
@@ -49,11 +49,11 @@ func SaveToDB(g *Game) error {
     if err != nil {
       log.Error(err)
     }
-    ttl := int(hero.NextLevelAt.Sub(time.Now()).Seconds())
+    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
 
-    _, err = stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.Token,
-      false, hero.Level, ttl, hero.Xpos, hero.Ypos,
-      hero.Ring, hero.Amulet, hero.Charm, hero.Weapon, hero.Helm, hero.Tunic, hero.Gloves, hero.Shield, hero.Leggings, hero.Boots)
+    _, err = stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.token,
+      hero.Level, ttl, hero.Xpos, hero.Ypos,
+      hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm, hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves, hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
     if err != nil {
       log.Error(err)
     }
@@ -79,11 +79,9 @@ func LoadFromDB(g *Game) error {
     "COALESCE(token, '') AS token, " +
     "COALESCE(twitter, '') AS twiter, " +
     "COALESCE(email, 'NoEmail') AS email, " +
-    "COALESCE(title, '') AS title, " +
-    "COALESCE(race, '') AS race, " +
-    "isadmin, hero_level,  " +
+    "hero_level,  " +
     "COALESCE(hclass, '') AS hclass , ttl, " +
-    "COALESCE(userhost, '') AS userhost, hero_online, xpos, ypos, " +
+    "hero_online, xpos, ypos, " +
     "IFNULL(weapon, 0), IFNULL(tunic, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(ring, 0), " +
     "IFNULL(gloves, 0), IFNULL(boots, 0), IFNULL(helm, 0), IFNULL(charm, 0) , IFNULL(amulet, 0) " +
     "total_equipment FROM hero")
@@ -94,21 +92,20 @@ func LoadFromDB(g *Game) error {
   defer rows.Close()
 
   for rows.Next() {
-    hero := &Hero{}
+    hero := &Hero{Equipment: &Equipment{}}
     var ttl int
 
-    err = rows.Scan(&hero.HeroID, &hero.HeroName, &hero.FirstName, &hero.LastName, &hero.Token, &hero.Twitter, &hero.Email,
-      &hero.Title, &hero.HRace, &hero.IsAdmin, &hero.Level, &hero.HeroClass, &ttl, &hero.Userhost, &hero.Enabled,
-      &hero.Xpos, &hero.Ypos, &hero.Weapon, &hero.Tunic, &hero.Shield, &hero.Leggings, &hero.Ring, &hero.Gloves,
-      &hero.Boots, &hero.Helm, &hero.Charm, &hero.Amulet)
+    err = rows.Scan(&hero.id, &hero.HeroName, &hero.FirstName, &hero.LastName, &hero.token, &hero.Twitter, &hero.Email,
+      &hero.Level, &hero.HeroClass, &ttl, &hero.Enabled,
+      &hero.Xpos, &hero.Ypos, &hero.Equipment.Weapon, &hero.Equipment.Tunic, &hero.Equipment.Shield, &hero.Equipment.Leggings, &hero.Equipment.Ring, &hero.Equipment.Gloves,
+      &hero.Equipment.Boots, &hero.Equipment.Helm, &hero.Equipment.Charm, &hero.Equipment.Amulet)
 
     if err != nil {
       log.Error(err)
       continue
     }
 
-    hero.TotalEquipment = hero.Weapon + hero.Tunic + hero.Shield + hero.Leggings + hero.Ring + hero.Gloves + hero.Boots + hero.Helm + hero.Charm + hero.Amulet
-    hero.NextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
+    hero.nextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
     g.heroes = append(g.heroes, *hero)
 
   }
@@ -155,7 +152,7 @@ func (g *Game) saveEventToDB(message string, heroes []*Hero) error {
   }
 
   for _, hero := range heroes {
-    if _, err = tx.Exec("INSERT INTO heroworldevent (hero_id, worldevent_id ) VALUES (?, ?)", hero.HeroID, eventID); err != nil {
+    if _, err = tx.Exec("INSERT INTO heroworldevent (hero_id, worldevent_id ) VALUES (?, ?)", hero.id, eventID); err != nil {
       return err
     }
   }

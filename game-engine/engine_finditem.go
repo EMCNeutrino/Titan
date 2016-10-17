@@ -68,6 +68,6 @@ func (g *Game) findItem(hero *Hero) {
 
     g.sendEvent(message, hero)
   } else {
-    log.Debugf("No items found for Hero: %s (ID: %d) | Level: %d", hero.HeroName, hero.HeroID, hero.Level)
+    log.Debugf("No items found for Hero: %s (ID: %d) | Level: %d", hero.HeroName, hero.id, hero.Level)
   }
 }
