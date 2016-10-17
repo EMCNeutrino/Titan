@@ -7,9 +7,12 @@ import (
 )
 
 type Join struct {
-  Name      string `json:"name" binding:"required"`
-  HeroClass string `json:"heroClass" binding:"required"`
+  FirstName string `json:"firstName" binding:"required"`
+  LastName  string `json:"lastName" binding:"required"`
   Email     string `json:"email" binding:"required"`
+  HeroName  string `json:"heroName" binding:"required"`
+  HeroClass string `json:"heroClass" binding:"required"`
+  Twitter   string `json:"twitter" binding:"required"`
 }
 
 type API struct {
@@ -47,7 +50,14 @@ func (api *API) heroPost(c *gin.Context) {
     return
   }
 
-  req := JoinRequest{TokenRequest: TokenRequest{GameRequest: GameRequest{Response: make(chan GameResponse)}, token: token}, name: json.Name, email: json.Email, heroClass: json.HeroClass}
+  req := JoinRequest{TokenRequest: TokenRequest{GameRequest: GameRequest{Response: make(chan GameResponse)}, token: token},
+    firstName: json.FirstName,
+    lastName:  json.LastName,
+    email:     json.Email,
+    twitter:   json.Twitter,
+    heroName:  json.HeroName,
+    heroClass: json.HeroClass,
+  }
   api.game.joinChan <- req
   res := <-req.Response
   if res.success {

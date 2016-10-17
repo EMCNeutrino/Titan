@@ -1,7 +1,10 @@
+package main
 
 import (
   "math/rand"
   "strconv"
+
+  log "github.com/Sirupsen/logrus"
 )
 
 // HandOfGod function implements the Gods powers on the Realm. It happens 1 an hour and it has 1/4000 chances

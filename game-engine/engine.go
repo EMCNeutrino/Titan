@@ -85,7 +85,7 @@ func (g *Game) StartEngine() {
       }
     case req := <-g.joinChan:
       log.Info("Join hero")
-      success, message := g.joinHero(req.name, req.email, req.heroClass, req.TokenRequest.token)
+      success, message := g.joinHero(req.firstName, req.lastName, req.email, req.twitter, req.heroName, req.heroClass, req.TokenRequest.token)
       req.Response <- GameResponse{success: success, message: message}
       close(req.Response)
     case req := <-g.activateHeroChan:
@@ -101,18 +101,19 @@ func (g *Game) StartEngine() {
 
 }
 
-func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
-
-  //TODO: Add twitter, player name, lastname, hero class, hero title, hero race.
+func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass, adminToken string) (bool, string) {
 
   if !g.authorizeAdmin(adminToken) {
     return false, "You are not authorized to perform this action."
   }
 
   hero := &Hero{
-    HeroName:      name,
+    FirstName:     firstName,
+    LastName:      lastName,
     Email:         email,
-    HClass:        class,
+    Twitter:       twitter,
+    HeroName:      heroName,
+    HeroClass:     heroClass,
     Enabled:       false,
     Token:         randToken(),
     Level:         0,

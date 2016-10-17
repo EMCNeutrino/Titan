@@ -38,10 +38,10 @@ func SaveToDB(g *Game) error {
 
   for _, hero := range g.heroes {
     stmt, err := db.Prepare("INSERT INTO hero " +
-      "(hero_name, email, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
+      "(player_name, player_lastname, hero_name, email, twitter, hclass, hero_online, token, isAdmin, hero_level, ttl, xpos, ypos, " +
       " ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
       ") " +
-      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
+      "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) " +
       "ON DUPLICATE KEY UPDATE " +
       "hero_online=VALUES(hero_online), hero_level=VALUES(hero_level), ttl=VALUES(ttl), xpos=VALUES(xpos), ypos=VALUES(ypos), " +
       "ring=VALUES(ring), amulet=VALUES(amulet), charm=VALUES(charm), weapon=VALUES(weapon), " +
@@ -52,7 +52,8 @@ func SaveToDB(g *Game) error {
     }
     ttl := int(hero.NextLevelAt.Sub(time.Now()).Seconds())
 
-    _, err = stmt.Exec(hero.HeroName, hero.Email, hero.HClass, hero.Enabled, hero.Token, false, hero.Level, ttl, hero.Xpos, hero.Ypos,
+    _, err = stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.Token,
+      false, hero.Level, ttl, hero.Xpos, hero.Ypos,
       hero.Ring, hero.Amulet, hero.Charm, hero.Weapon, hero.Helm, hero.Tunic, hero.Gloves, hero.Shield, hero.Leggings, hero.Boots)
     if err != nil {
       log.Error(err)
@@ -71,7 +72,10 @@ func LoadFromDB(g *Game) error {
   }
   defer db.Close()
 
-  rows, err := db.Query("SELECT hero_id, COALESCE(hero_name, '') AS hero_name, COALESCE(player_name, '') AS player_name," +
+  rows, err := db.Query("SELECT " +
+    "hero_id, " +
+    "COALESCE(hero_name, '') AS hero_name, " +
+    "COALESCE(player_name, '') AS player_name," +
     "COALESCE(player_lastname, '') AS player_lastname, " +
     "COALESCE(token, '') AS token, " +
     "COALESCE(twitter, '') AS twiter, " +
@@ -94,8 +98,8 @@ func LoadFromDB(g *Game) error {
     hero := &Hero{}
     var ttl int
 
-    err = rows.Scan(&hero.HeroID, &hero.HeroName, &hero.UserName, &hero.UserLastName, &hero.Token, &hero.Twitter, &hero.Email,
-      &hero.Title, &hero.HRace, &hero.IsAdmin, &hero.Level, &hero.HClass, &ttl, &hero.Userhost, &hero.Enabled,
+    err = rows.Scan(&hero.HeroID, &hero.HeroName, &hero.FirstName, &hero.LastName, &hero.Token, &hero.Twitter, &hero.Email,
+      &hero.Title, &hero.HRace, &hero.IsAdmin, &hero.Level, &hero.HeroClass, &ttl, &hero.Userhost, &hero.Enabled,
       &hero.Xpos, &hero.Ypos, &hero.Weapon, &hero.Tunic, &hero.Shield, &hero.Leggings, &hero.Ring, &hero.Gloves,
       &hero.Boots, &hero.Helm, &hero.Charm, &hero.Amulet)
 

@@ -1,3 +1,5 @@
+package main
+
 import "math/rand"
 
 func (g *Game) Calamity() {

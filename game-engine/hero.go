@@ -5,8 +5,8 @@ import "time"
 // Hero struct contains information about each Hero
 type Hero struct {
   HeroID         int64     `json:"heroid"`
-  UserName       string    `json:"username"`
-  UserLastName   string    `json:"userlastname"`
+  FirstName      string    `json:"username"`
+  LastName       string    `json:"userlastname"`
   HeroName       string    `json:"heroname"`
   Token          string    `json:"token"`
   Twitter        string    `json:"twitter"`
@@ -15,7 +15,7 @@ type Hero struct {
   HRace          string    `json:"herorace"`
   IsAdmin        bool      `json:"isadmin"`
   Level          int       `json:"herolevel"`
-  HClass         string    `json:"heroclass"`
+  HeroClass      string    `json:"heroclass"`
   TTL            int       `json:"TTL"`
   Userhost       string    `json:"userhost"`
   Enabled        bool      `json:"enabled"`
