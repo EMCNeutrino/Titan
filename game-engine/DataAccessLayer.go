@@ -13,7 +13,7 @@ import (
 //Return: None
 func Insert_World_Event_for_Hero(heroID int64, worldEvent string, conn *sql.DB) {
 
-	log.Info("Inserting World Event: HeroID: " + strconv.FormatInt(heroID, 10) + " | Event: " + worldEvent)
+	log.Info("[DAL] Insert_World_Event_for_Hero : HeroID: " + strconv.FormatInt(heroID, 10) + " | Event: " + worldEvent)
 
 	var query = "INSERT INTO worldevent (event_text) VALUES ('" + worldEvent + "')"
 
@@ -21,11 +21,11 @@ func Insert_World_Event_for_Hero(heroID int64, worldEvent string, conn *sql.DB) 
 
 	statement, err := conn.Exec(query)
 
-	last_worldevent_Id, err := statement.LastInsertId()
-
 	if err != nil {
 		log.Errorln("[DAL] Insert_Item_for_Hero: Worldevent Insert failed: %s", err)
 	}
+
+	last_worldevent_Id, err := statement.LastInsertId()
 
 	if last_worldevent_Id != 0 {
 
@@ -59,7 +59,7 @@ func Get_Item_By_HeroID(heroID int64, item_type string, conn *sql.DB) int {
 	var current_item_level int
 
 	//Check what is the level of the current Item, update value if needed, msg player
-	var query = "SELECT " + item_type + " FROM item WHERE hero_id = ?"
+	var query = "SELECT " + item_type + " FROM hero WHERE hero_id = ?"
 
 	log.Info("Select Query: " + query)
 
@@ -88,7 +88,7 @@ func Update_Item_for_Hero(heroID int64, item_type string, item_level int, conn *
 
 	log.Info("Updating Item: " + item_type + " with Level: " + strconv.Itoa(item_level) +" from Hero ID: " + strconv.FormatInt(heroID, 10))
 
-	var query = "UPDATE item SET " + item_type + "=" + strconv.Itoa(item_level) +" WHERE hero_id="+ strconv.FormatInt(heroID, 10)
+	var query = "UPDATE hero SET " + item_type + "=" + strconv.Itoa(item_level) +" WHERE hero_id="+ strconv.FormatInt(heroID, 10)
 
 	_, err := conn.Exec(query)
 
