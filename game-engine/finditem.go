@@ -18,7 +18,7 @@ func Find_item(heroID int64, hero_level int, hero_name string, conn *sql.DB){
 
 	//log.Info("Find Items called, Hero Level: " + strconv.Itoa(hero_level))
 
-	items :=[10]string{"weapon","tunic","shield","leggins","ring","gloves","boots","helm","charm","amulet"}
+	items :=[10]string{"weapon","tunic","shield","leggings","ring","gloves","boots","helm","charm","amulet"}
 
 	find_chance := [51]float32{ 100.00, 91.93227152,84.51542547,77.69695042,71.42857143,65.66590823,60.36816105,55.49782173,
 		51.02040816,46.90422016,43.12011504,39.64130124,36.44314869,33.5030144,	30.80008217,28.31521517,26.03082049,
