@@ -117,6 +117,7 @@ func (g *Game) StartEngine() {
 		case <-ticker.C:
 			g.moveHeroes()
 			g.CheckHeroLevel()
+			g.HandOfGod()
 		//TODO: check battles
 		case <-tickerDB.C:
 			log.Info("Saving game state to DB")
@@ -235,7 +236,7 @@ GodSend			4 hours
 // to strike a Hero. The outcome has 80 chances to be good and 20 chances to the bad
 //Parameters: SQL DB connection Object
 //Return: None
-func (g *Game) HandOfGod(conn *sql.DB) {
+func (g *Game) HandOfGod() {
 
 	sqldb, err := sql.Open("mysql", g.dbconnection)
 
@@ -244,32 +245,33 @@ func (g *Game) HandOfGod(conn *sql.DB) {
 	}
 	defer sqldb.Close()
 
-
 	for i := range g.heroes {
 		if !g.heroes[i].Enabled {
 			continue
 		}
 
-		if(rand.Int31n(4000) == 1){
+		if(rand.Int31n(40000) == 1){
 
 			var hero_chance = rand.Intn(10)
 			var message string
 			var hero_next_level = g.heroes[i].Level + 1
-			var time_calculation = int((((rand.Intn(71)+5))/100) * hero_next_level * 3600)
+			var time_calculation = int(float32((rand.Intn(71) + 5))/100  * float32(hero_next_level * 3600))
+
+			log.Infof("[Engine] : Hand of Good : time_calculation: %d", time_calculation)
 
 			if(hero_chance >= 3 ) {
 				// Good outcome
 
-				message = "Verily I say undo thee, the Heavens have burst forth, and the blessed hand of God Carried" +
-					g.heroes[i].HeroName + " for " + strconv.Itoa(time_calculation) + " seconds. Toward level " +
-					strconv.Itoa(hero_next_level)
+				message = "Verily I say undo thee, the Heavens have burst forth, and the blessed Hand Of God carried " +
+					g.heroes[i].HeroName + " for " + strconv.Itoa(time_calculation) +
+					" seconds toward level " +	strconv.Itoa(hero_next_level)
 
 				//TODO: Update the Hero TTL for the next level
 
 			} else { //Bad outcome
 
 
-				message = "Thereupon He stretched out His little finger among them and consummed" +
+				message = "Thereupon He stretched out His little finger among them and consummed " +
 					g.heroes[i].HeroName + " with fier, slowing the heathen " + strconv.Itoa(time_calculation) +
 					" seconds from  level " + strconv.Itoa(hero_next_level)
 
@@ -279,7 +281,7 @@ func (g *Game) HandOfGod(conn *sql.DB) {
 			log.Info("[Hand of God]" + message)
 
 			//Add Event to WorldEvents and HeroWorldEvents Tables
-			Insert_World_Event_for_Hero(g.heroes[i].HeroID, message, conn)
+			Insert_World_Event_for_Hero(g.heroes[i].HeroID, message, sqldb)
 
 
 		}
