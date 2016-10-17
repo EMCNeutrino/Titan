@@ -1,0 +1,7 @@
+{
+  "Dbuser":"titanuser",
+  "Dbpass":"Neutrin0R0cks!",
+  "Dbip":"127.0.0.1",
+  "Dbport":"3306",
+  "Dbname":"titandb"
+}
