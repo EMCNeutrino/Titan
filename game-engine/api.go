@@ -69,7 +69,15 @@ func (api *API) heroPost(c *gin.Context) {
 
 func (api *API) heroGet(c *gin.Context) {
   name := c.Param("name")
-  c.String(http.StatusOK, "Hello Get ID: %s", name)
+
+  hero, err := api.game.getHero(name)
+  if err != nil {
+    c.String(http.StatusNotFound, "Hero not found")
+    return
+  }
+
+  hero.TTL = hero.getTTL()
+  c.JSON(http.StatusOK, hero)
 }
 
 func (api *API) heroActivate(c *gin.Context) {

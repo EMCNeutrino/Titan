@@ -23,7 +23,7 @@ func truncateInt(number, min, max int) int {
   return number
 }
 
-func getTTL(level int) time.Duration {
+func getTTLForLevel(level int) time.Duration {
   return time.Duration(levelUpSeconds * (math.Pow(levelUpBase, float64(level))))
 }
 

@@ -100,3 +100,7 @@ func (h *Hero) updateItem(itemType string, itemLevel int) {
     h.Amulet = itemLevel
   }
 }
+
+func (h *Hero) getTTL() int {
+  return int(h.NextLevelAt.Sub(time.Now()).Seconds())
+}

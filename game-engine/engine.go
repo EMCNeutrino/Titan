@@ -117,7 +117,7 @@ func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass
     Enabled:       false,
     Token:         randToken(),
     Level:         0,
-    NextLevelAt:   time.Now().Add(99999 * time.Hour),
+    NextLevelAt:   ttlToDatetime(99999 * time.Hour),
     HeroCreatedAt: time.Now(),
     Ring:          0,
     Amulet:        0,
@@ -148,7 +148,7 @@ func (g *Game) activateHero(name, token string) bool {
     return false
   }
 
-  ttl := getTTL(1) // Time to level 1
+  ttl := getTTLForLevel(1) // Time to level 1
   g.heroes[i].NextLevelAt = ttlToDatetime(ttl)
   g.heroes[i].Enabled = true
   log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
@@ -179,6 +179,15 @@ func (g *Game) getHeroIndex(name string) int {
   return -1
 }
 
+func (g *Game) getHero(name string) (Hero, error) {
+  for _, hero := range g.heroes {
+    if hero.HeroName == name {
+      return hero, nil
+    }
+  }
+  return Hero{}, fmt.Errorf("Hero not found")
+}
+
 func (g *Game) sendEvent(message string, heroes ...*Hero) {
   log.Infof("Event: %s", message)
 
@@ -205,8 +214,8 @@ func (g *Game) checkLevels() {
 
     if g.heroes[i].NextLevelAt.Before(time.Now()) {
       level := g.heroes[i].Level + 1
-      ttl := getTTL(level + 1)
-      g.heroes[i].NextLevelAt = time.Now().Add(ttl * time.Second)
+      ttl := getTTLForLevel(level + 1)
+      g.heroes[i].NextLevelAt = ttlToDatetime(ttl)
       g.heroes[i].Level = level
 
       message := fmt.Sprintf("%s has attained level %d! Next level in %d seconds.", g.heroes[i].HeroName, level, ttl)
