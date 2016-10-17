@@ -11,8 +11,14 @@ import (
 
 )
 
-func getDBConnection() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "titanuser:Neutrin0R0cks!@/titandb")
+// Get Database Connection, builds and returns the database connection
+//Parameters: None
+//Return: Database connection object and the Error object
+func GetDBConnection() (*sql.DB, error) {
+
+	var dbconn = Db_connection()
+
+	db, err := sql.Open("mysql", dbconn)
 	if err != nil {
 		return nil, err
 	}
@@ -26,10 +32,13 @@ func getDBConnection() (*sql.DB, error) {
 	return db, nil
 }
 
+// Save to DB, persists the Heros in the Database
+//Parameters: None
+//Return: Database connection object and the Error object
 func SaveToDB(g *Game) error {
 
 	log.Info("[Persister] SaveToDB Called ------------------------------------------------------- ")
-	db, err := getDBConnection()
+	db, err := GetDBConnection()
 	if err != nil {
 		return err
 	}
@@ -62,11 +71,15 @@ func SaveToDB(g *Game) error {
 	return nil
 }
 
+
+//Load From DB loads the Heros in the hero table and adds them to the realm
+//Parameters:
+//Return: Game Reference Object and Error object
 func LoadFromDB() (*Game, error) {
 
 	log.Info("[Persister] LoadFromDB Called ------------------------------------------------------- ")
 
-	db, err := getDBConnection()
+	db, err := GetDBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -135,6 +148,10 @@ func LoadFromDB() (*Game, error) {
 	return game, nil
 }
 
+//Hero Joined World Notification, messages the World about the hero joining the realm
+// and it saves the message in the world events and hero events tables
+//Parameters: Hero reference, and the SQL.DB connection.
+//Return: None
 func Hero_Joined_World_Notification(hero *HeroDB, conn *sql.DB) {
 
 	log.Info("[Persister] Hero_Joined_World_Notification Called ------------------------------------------------------- ")
