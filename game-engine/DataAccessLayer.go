@@ -59,7 +59,7 @@ func Get_Item_By_HeroID(heroID int64, item_type string, conn *sql.DB) int {
 	var current_item_level int
 
 	//Check what is the level of the current Item, update value if needed, msg player
-	var query = "SELECT " + item_type + " FROM hero WHERE hero_id = ?"
+	var query = "SELECT " + item_type + " FROM hero WHERE hero_id=?"
 
 	log.Info("Select Query: " + query)
 
