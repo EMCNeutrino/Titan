@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"strconv"
 	log "github.com/Sirupsen/logrus"
+
 )
 
 
@@ -86,16 +87,46 @@ func Get_Item_By_HeroID(heroID int64, item_type string, conn *sql.DB) int {
 //Return: None
 func Update_Item_for_Hero(heroID int64, item_type string, item_level int, conn *sql.DB) {
 
-	log.Info("Updating Item: " + item_type + " with Level: " + strconv.Itoa(item_level) +" from Hero ID: " + strconv.FormatInt(heroID, 10))
+	log.Info("[DAL] Updating Item: " + item_type + " with Level: " + strconv.Itoa(item_level) +" from Hero ID: " + strconv.FormatInt(heroID, 10))
 
-	var query = "UPDATE hero SET " + item_type + "=" + strconv.Itoa(item_level) +" WHERE hero_id="+ strconv.FormatInt(heroID, 10)
+	var query = "UPDATE hero SET " + item_type + "=? WHERE hero_id=" + strconv.FormatInt(heroID, 10)
+	var query2 = "UPDATE hero SET " + item_type + "=" + strconv.Itoa(item_level) + " WHERE hero_id=" + strconv.FormatInt(heroID, 10)
+	log.Info("[DAL] Updating Item: Query: " + query)
+	log.Info("[DAL] Updating Item: Query: " + query2)
 
-	_, err := conn.Exec(query)
+	statement, err := conn.Prepare(query)
 
 	if err != nil {
 		log.Errorln("DB: Insert_Item_for_Hero: Item Insert failed: %s", err)
 	}
 
+	response, err := statement.Exec(item_level)
 
-	log.Info("Executed: " + query)
+	if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Item Insert failed: %s", err)
+	}
+
+	log.Info("[DAL] Updating Item: Query: Executed: " + query)
+
+
+    affected, err := response.RowsAffected()
+
+	/*
+	while (affected < 1) {
+
+		result, err := conn.Exec(query2)
+
+		if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Item Insert failed: %s", err)
+	}
+	}
+	*/
+
+    if err != nil {
+		log.Errorln("DB: Insert_Item_for_Hero: Item Insert failed: %s", err)
+	}
+
+    log.Infof("[DAL] Updating Item: Rows Affected: %d ", affected)
 }
+
+
