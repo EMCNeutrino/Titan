@@ -117,7 +117,7 @@ func (g *Game) StartEngine() {
 		case <-ticker.C:
 			g.moveHeroes()
 			g.CheckHeroLevel()
-			g.HandOfGod()
+			g.HandOfGod(4000*3600)
 		//TODO: check battles
 		case <-tickerDB.C:
 			log.Info("Saving game state to DB")
@@ -143,6 +143,8 @@ func (g *Game) StartEngine() {
 }
 
 func (g *Game) joinHero(name, email, class, adminToken string) (bool, string) {
+
+	//TODO: Add twitter, player name, lastname, hero class, hero title, hero race.
 
 	if !g.authorizeAdmin(adminToken) {
 		return false, "You are not authorized to perform this action."
@@ -234,9 +236,9 @@ GodSend			4 hours
 
 //Hand of God function implements the Gods powers on the Realm. It happens 1 an hour and it has 1/4000 chances
 // to strike a Hero. The outcome has 80 chances to be good and 20 chances to the bad
-//Parameters: SQL DB connection Object
+//Parameters: Time trigger to release hand of good.
 //Return: None
-func (g *Game) HandOfGod() {
+func (g *Game) HandOfGod(trigger int) {
 
 	sqldb, err := sql.Open("mysql", g.dbconnection)
 
@@ -250,7 +252,7 @@ func (g *Game) HandOfGod() {
 			continue
 		}
 
-		if(rand.Int31n(40000) == 1){
+		if(rand.Intn(trigger) == 1){
 
 			var hero_chance = rand.Intn(10)
 			var message string
@@ -291,13 +293,21 @@ func (g *Game) HandOfGod() {
 
 //God Send function implements the Gods gits to Heros  on the Realm. It happens 1 an hour and it has 1/4000 chances
 // to strike a Hero. The outcome has 80 chances to be good and 20 chances to the bad
-//Parameters: SQL DB connection Object
+//Parameters: Time trigger to release hand of good.
 //Return: None
-func (g *Game) GodSend() {
+func (g *Game) GodSend(trigger int) {
 
-	//TODO: Complete GodSend
-	/*
-	  var good_events = map[int]string{}
+	log.Info("[Engine] GodSend Called.................................................")
+
+	sqldb, err := sql.Open("mysql", g.dbconnection)
+
+	if err != nil {
+		log.Errorln("[Engine] : GodSend : Database settings failed: %s", err)
+	}
+	defer sqldb.Close()
+
+
+	var good_events = map[int]string{}
 
 		good_events[1] = " found a pair of nice Shoes"
 		good_events[2] = " caught a Unicorn"
@@ -327,30 +337,70 @@ func (g *Game) GodSend() {
 		good_events[25] = " got his first patch +4 approved in OpenStack"
 		good_events[26] = " got a HEAT template successfully deployed"
 
-	  items :=[10]string{"weapon","tunic","shield","leggins","ring","gloves","boots","helm","charm","amulet"}
-
-	*/
+	var message string
 
 	for i := range g.heroes {
 		if !g.heroes[i].Enabled {
 			continue
 		}
 
-		if(rand.Int31n(2000) == 1){
+		if(rand.Intn(trigger) == 1){
 
-			if(rand.Intn(10) == 1) {  //Ultra Godsend
+			if(rand.Intn(10) < 2) {  //Ultra Godsend 20%
+
+				//Select a Good Events Random text + Removes time to level up
+				message = " WOWO!!!"
+
+			} else {  // Upgrade a Weapon
+
+					items :=[6]string{"weapon","tunic","shield","leggings","amulet", "charm"}
+
+					var item_type = rand.Intn(10)
+					var item_name = items[item_type]
 
 
-			} else {
+					switch item_name {
+
+						case "weapon":
+							message = " WOWO!!!"
+							return
+
+						case "tunic":
+							message = " WOWO!!!"
+							return
+
+						case "shield":
+							message = " WOWO!!!"
+							return
+
+						case "leggings":
+							message = " WOWO!!!"
+							return
+
+						case "amulet":
+							message = " WOWO!!!"
+							return
+
+						case "charm":
+							message = " WOWO!!!"
+							return
+
+						default:
+
+					}
 
 
 			}
-			g.heroes[i].Xpos = truncateInt(g.heroes[i].Xpos+(rand.Intn(3)-1), xMin, xMax)
-			g.heroes[i].Ypos = truncateInt(g.heroes[i].Ypos+(rand.Intn(3)-1), yMin, yMax)
-
 		}
 
+		//Add Event to WorldEvents and HeroWorldEvents Tables
+	Insert_World_Event_for_Hero(g.heroes[i].HeroID, message, sqldb)
+
 	}
+
+
+
+
 }
 
 func (g *Game) Calamity() {
