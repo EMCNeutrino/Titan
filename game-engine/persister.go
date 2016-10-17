@@ -129,17 +129,6 @@ func (g *Game) saveEventToDB(message string, heroes []*Hero) error {
   if err != nil {
     return err
   }
-  defer func() {
-    if err != nil {
-      tx.Rollback()
-      return
-    }
-    err = tx.Commit()
-    if err != nil {
-      tx.Rollback()
-      return
-    }
-  }()
 
   r, err := tx.Exec("INSERT INTO worldevent (event_text) VALUES (?)", message)
   if err != nil {
@@ -155,6 +144,12 @@ func (g *Game) saveEventToDB(message string, heroes []*Hero) error {
     if _, err = tx.Exec("INSERT INTO heroworldevent (hero_id, worldevent_id ) VALUES (?, ?)", hero.id, eventID); err != nil {
       return err
     }
+  }
+
+  err = tx.Commit()
+  if err != nil {
+    tx.Rollback()
+    return err
   }
 
   return nil

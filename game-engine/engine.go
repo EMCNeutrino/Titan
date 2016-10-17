@@ -227,8 +227,8 @@ func (g *Game) checkLevels() {
 
       message := fmt.Sprintf("%s has attained level %d! Next level in %d seconds.", g.heroes[i].HeroName, level, ttl)
 
-      g.sendEvent(message, &g.heroes[i])
-      g.findItem(&g.heroes[i])
+      go g.sendEvent(message, &g.heroes[i])
+      go g.findItem(&g.heroes[i])
     }
   }
 }

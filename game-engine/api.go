@@ -78,7 +78,7 @@ func (api *API) heroGet(c *gin.Context) {
   }
 
   hero.TTL = hero.getTTL()
-  hero.Equipment.Total = hero.Equipment.Weapon + hero.Equipment.Tunic + hero.Equipment.Shield + hero.Equipment.Leggings + hero.Equipment.Ring + hero.Equipment.Gloves + hero.Equipment.Boots + hero.Equipment.Helm + hero.Equipment.Charm + hero.Equipment.Amulet
+  hero.Equipment.Total = hero.getTotalItems()
   c.JSON(http.StatusOK, hero)
 }
 
