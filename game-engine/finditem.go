@@ -16,6 +16,9 @@ import (
 //Return: None
 func Find_item(heroID int64, hero_level int, hero_name string, conn *sql.DB){
 
+	//log.Infof("[Find Item] Called ....... HeroID: %v  | Level: %v | Name: %v", heroID, hero_level, hero_name)
+
+
 	//log.Info("Find Items called, Hero Level: " + strconv.Itoa(hero_level))
 
 	items :=[10]string{"weapon","tunic","shield","leggings","ring","gloves","boots","helm","charm","amulet"}
@@ -29,7 +32,7 @@ func Find_item(heroID int64, hero_level int, hero_name string, conn *sql.DB){
 
 	var item_type int
 	var item_name string
-	var item_level int
+	var new_item_level int
 	var item_found_chance float32
 
 	for i := hero_level; i > 0; i-- {
@@ -46,11 +49,11 @@ func Find_item(heroID int64, hero_level int, hero_name string, conn *sql.DB){
 		if(rand.Intn(100) <= int(item_found_chance)){
 
 			item_gain_percentage := float64(rand.Intn(100))
-			item_level = int(float64(i) + (float64(i) * (item_gain_percentage/100)))
+			new_item_level = int(float64(i) + (float64(i) * (item_gain_percentage/100)))
 			item_type = rand.Intn(10)
 			item_name = items[item_type]
 
-			var log_msg = "Item Found: " + item_name + " | Hero Level: " + strconv.Itoa(hero_level)+ " found @ Level: " + strconv.Itoa(i)+ " Item Level: " + strconv.Itoa(item_level)
+			var log_msg = "Item Found: " + item_name + " | Hero Level: " + strconv.Itoa(hero_level)+ " found @ Level: " + strconv.Itoa(i)+ " Item Level: " + strconv.Itoa(new_item_level)
 
 			log.Info(log_msg)
 
@@ -58,42 +61,48 @@ func Find_item(heroID int64, hero_level int, hero_name string, conn *sql.DB){
 		}
 	}
 
-	//check if No items where found
+	//check if No items where found | Name of the item is 0
+	if len(item_name) > 0 {
 
-	var current_item_level = Get_Item_By_HeroID(heroID, item_name, conn)
+		var current_item_level = Get_Item_By_HeroID(heroID, item_name, conn)
 
-	log.Info("Items: Current: " + strconv.Itoa(current_item_level) + " | New: " + strconv.Itoa(item_level))
+		log.Info("Items: Current: " + strconv.Itoa(current_item_level) + " | New: " + strconv.Itoa(new_item_level))
 
-	var message string
-	var message_plural string
+		var message string
+		var message_plural_good string
+		var message_plural_bad string
 
-	if (item_name == items[3] || item_name == items[5] || item_name == items[6]) {
+		if (item_name == items[3] || item_name == items[5] || item_name == items[6]) {
 
-		message_plural =  " are only level "
+			message_plural_good = " are only level "
+			message_plural_bad = " are level "
+		} else {
 
+			message_plural_good = " is only level "
+			message_plural_bad = " is level "
+		}
+
+		if new_item_level > current_item_level {
+
+			//Replace the current item value with the new one
+			Update_Item_for_Hero(heroID, item_name, new_item_level, conn)
+
+			message = "You found a level " + strconv.Itoa(new_item_level) + " " + item_name + "! Your current " + item_name + message_plural_good + strconv.Itoa(current_item_level) + ", so it seems Luck is with you!"
+
+		} else {
+
+			//Message back to player that current item level is better
+			message = "You found a level " + strconv.Itoa(new_item_level) + " " + item_name + "! Your current " + item_name + message_plural_bad + strconv.Itoa(current_item_level) + ", so it seems Luck is against you. You toss the " + item_name + "."
+
+		}
+
+		log.Info(message)
+
+		//Message back to player that new item is better
+		Insert_World_Event_for_Hero(heroID, message, conn)
 	} else {
 
-		message_plural =  " is only level "
+		log.Infof("[Find Item] No items found for HeroID: %v  | Level: %d | Name: %v", heroID, hero_level, hero_name)
 	}
-
-	if item_level > current_item_level {
-
-		//Replace the current item value with the new one
-		Update_Item_for_Hero(heroID,item_name, item_level, conn)
-
-		message = "You found a level " + strconv.Itoa(item_level) + " " + item_name + "! Your current " + item_name + message_plural +  strconv.Itoa(current_item_level) + ", so it seems Luck is with you!"
-
-	} else {
-
-		//Message back to player that current item level is better
-		message = "You found a level " + strconv.Itoa(item_level) + " " + item_name + "! Your current " + item_name + message_plural +  strconv.Itoa(current_item_level) + ", so it seems Luck is against you. You toss the " + item_name + "."
-
-	}
-
-	log.Info(message)
-
-	//Message back to player that new item is better
-	Insert_World_Event_for_Hero(heroID, message, conn)
-
 
 }
