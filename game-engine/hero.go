@@ -36,17 +36,11 @@ type Hero struct {
   HeroCreatedAt  time.Time `json:"herocreatedat"`
 }
 
-type WorldEvent struct {
-  WorldEventID int64     `json:"worldeventid"`
-  EventType    string    `json:"eventtype"`
-  EventText    string    `json:"eventtext"`
-  EventTime    time.Time `json:"eventtime"`
-}
-
-type HeroWorldEvent struct {
-  HeroWorldEventID int64 `json:"heroworldeventid"`
-  WorldEventID     int64 `json:"worldeventid"`
-  HeroID           int64 `json:"heroid"`
+type Event struct {
+  ID   int64
+  Type string    `json:"type"`
+  Text string    `json:"text"`
+  Time time.Time `json:"time"`
 }
 
 func (h *Hero) getItemLevel(itemType string) int {

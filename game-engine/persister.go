@@ -2,7 +2,6 @@ package main
 
 import (
   "database/sql"
-  "strconv"
   "time"
 
   log "github.com/Sirupsen/logrus"
@@ -13,7 +12,7 @@ import (
 // GetDBConnection builds and returns the database connection
 func GetDBConnection(databaseURL string) (*sql.DB, error) {
 
-  db, err := sql.Open("mysql", databaseURL)
+  db, err := sql.Open("mysql", databaseURL+"?parseTime=true")
   if err != nil {
     return nil, err
   }
@@ -164,34 +163,34 @@ func (g *Game) saveEventToDB(message string, heroes []*Hero) error {
   return nil
 }
 
-// Get Item by Hero ID, retries an item's level value for the specified Hero ID
-//Parameters: Hero ID, Type of Item, and the SQL.DB connection.
-//Return: The Item level value
-func Get_Item_By_HeroID(heroID int64, item_type string, conn *sql.DB) int {
-
-  log.Info("Get_item_level_for_user ")
-
-  var current_item_level int
-
-  //Check what is the level of the current Item, update value if needed, msg player
-  var query = "SELECT " + item_type + " FROM hero WHERE hero_id=?"
-
-  log.Info("Select Query: " + query)
-
-  stmt, err := conn.Prepare(query)
+func (g *Game) GetEventsForHeroFromDB(heroID int64) ([]Event, error) {
+  db, err := GetDBConnection(g.databaseURL)
   if err != nil {
-    log.Errorln("DB: Get_Item_By_HeroID: Prepare Query failed: %s", err)
+    return nil, err
   }
+  defer db.Close()
 
-  err = stmt.QueryRow(heroID).Scan(&current_item_level)
+  rows, err := db.Query("SELECT w.event_text, w.event_time FROM heroworldevent h INNER JOIN worldevent w ON h.worldevent_id=w.worldevent_id WHERE h.hero_id=? ORDER BY w.event_time DESC", heroID)
 
   if err != nil {
-    log.Errorln("DB: Get_Item_By_HeroID: QueryRow failed: %s", err)
+    return nil, err
+  }
+  defer rows.Close()
+
+  var events []Event
+  for rows.Next() {
+    event := &Event{}
+    err = rows.Scan(&event.Text, &event.Time)
+    if err != nil {
+      log.Error(err)
+      continue
+    }
+    events = append(events, *event)
+  }
+  err = rows.Err()
+  if err != nil {
+    return nil, err
   }
 
-  log.Info("Item Value: " + strconv.Itoa(current_item_level))
-
-  defer stmt.Close()
-
-  return current_item_level
+  return events, nil
 }

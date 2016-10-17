@@ -29,6 +29,7 @@ func (g *Game) StartAPI() {
   router.POST("/hero", api.heroPost)
   router.GET("/hero/:name", api.heroGet)
   router.GET("/hero/:name/activate", api.heroActivate)
+  router.GET("/hero/:name/events", api.heroEvents)
   router.GET("/exit", api.exit)
   router.Run(":8080")
 }
@@ -96,6 +97,29 @@ func (api *API) heroActivate(c *gin.Context) {
   } else {
     c.String(http.StatusBadRequest, res.message)
   }
+}
+
+func (api *API) heroEvents(c *gin.Context) {
+  name := c.Param("name")
+  token := c.Request.Header.Get("X-Auth-Token")
+  if len(token) == 0 {
+    c.String(http.StatusUnauthorized, "No auth token is present")
+    return
+  }
+
+  hero, err := api.game.getHero(name)
+  if err != nil {
+    c.String(http.StatusNotFound, "Hero not found")
+    return
+  }
+
+  events, err := api.game.GetEventsForHeroFromDB(hero.HeroID)
+  if err != nil {
+    c.String(http.StatusNotFound, "Could not get Hero events")
+    return
+  }
+
+  c.JSON(http.StatusOK, events)
 }
 
 func (api *API) exit(c *gin.Context) {
