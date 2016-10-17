@@ -3,6 +3,8 @@ package main
 import (
   "crypto/rand"
   "fmt"
+  "math"
+  "time"
 )
 
 func randToken() string {
@@ -19,4 +21,12 @@ func truncateInt(number, min, max int) int {
     return min
   }
   return number
+}
+
+func getTTL(level int) time.Duration {
+  return time.Duration(levelUpSeconds * (math.Pow(levelUpBase, float64(level))))
+}
+
+func ttlToDatetime(ttl time.Duration) time.Time {
+  return time.Now().Add(ttl * time.Second)
 }
