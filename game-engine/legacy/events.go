@@ -1,6 +1,7 @@
+package main
+
 /*
 
-package main
 
 bad_events = map[int]string{}
 
