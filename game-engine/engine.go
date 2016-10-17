@@ -14,7 +14,7 @@ const (
   yMax           = 500
   xMin           = 0
   yMin           = 0
-  levelUpSeconds = 10
+  levelUpSeconds = 10 //TODO: Change to 600
   levelUpBase    = float64(1.16)
 )
 
@@ -107,6 +107,10 @@ func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass
     return false, "You are not authorized to perform this action."
   }
 
+  if g.getHeroIndex(heroName) != -1 {
+    return false, "This Hero name is already taken"
+  }
+
   hero := &Hero{
     FirstName:   firstName,
     LastName:    lastName,
@@ -173,9 +177,9 @@ func (g *Game) authorizeAdmin(token string) bool {
   return g.adminToken == token
 }
 
-func (g *Game) getHeroIndex(name string) int {
+func (g *Game) getHeroIndex(heroName string) int {
   for i, hero := range g.heroes {
-    if hero.HeroName == name {
+    if hero.HeroName == heroName {
       return i
     }
   }
