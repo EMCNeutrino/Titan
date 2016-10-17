@@ -275,11 +275,11 @@ BEGIN
   SET @hero_name = (SELECT CONCAT(generate_fname(),' ', generate_lname()) as hero_name);
   SET @player_name = (generate_fname());
   SET @player_lastname = (generate_lname());
-  SET @email = (CONCAT(@player_name, '.', @player_lastname, randomizer(1,10000),'@dell.com'));
+  SET @email = (CONCAT(@player_name, '.', @player_lastname, randomizer(1,1000000),'@dell.com'));
   SET @twitter = (CONCAT('@', @player_name, '.', @player_lastname));
   SET @token = (SELECT UUID());
   SET @userpass = (SELECT UUID());
-  SET @hero_level = (randomizer(1,10));
+  SET @hero_level = (randomizer(1,5));
   SET @next_level_calc = (SELECT ROUND(600*(POW(1.16, @hero_level+1))) AS Level_Time);
   SET @next_level_calc2 = (SEC_TO_TIME((SELECT ROUND(600*(POW(1.16, @hero_level))) AS Level_Time)));
   SET @next_level  = (SELECT ADDTIME(NOW(), @next_level_calc2));
@@ -336,19 +336,19 @@ VALUES
   @next_level_calc,
   0,
   1,
-  randomizer(1,100),
-  randomizer(1,100),
+  randomizer(1,2),
+  randomizer(1,2),
   @next_level,
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
-  randomizer(1,100),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
+  randomizer(1,2),
   0
   
 );
