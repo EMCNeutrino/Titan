@@ -14,7 +14,7 @@ const (
   yMax           = 500
   xMin           = 0
   yMin           = 0
-  levelUpSeconds = 10 //TODO: Change to 600
+  levelUpSeconds = 600 //TODO: Change to 600
   levelUpBase    = float64(1.16)
 )
 
@@ -70,14 +70,16 @@ func (g *Game) StartEngine() {
 
   ticker := time.NewTicker(time.Second * 2)
   tickerDB := time.NewTicker(time.Minute * 1)
+  tickerHog := time.NewTicker(time.Minute * 30)
 
   for {
     select {
     case <-ticker.C:
       g.moveHeroes()
       g.checkLevels()
-      // g.HandOfGod(4000 * 3600)
-    //TODO: check battles
+      //TODO: check battles
+    case <-tickerHog.C:
+      g.handOfGod()
     case <-tickerDB.C:
       log.Info("Saving game state to DB")
       if err := SaveToDB(g); err != nil {
@@ -196,7 +198,7 @@ func (g *Game) getHero(name string) (Hero, error) {
 }
 
 func (g *Game) sendEvent(message string, heroes ...*Hero) {
-  log.Infof("Event: %s", message)
+  log.Infof("[Event] %s", message)
 
   g.saveEventToDB(message, heroes)
 }

@@ -94,10 +94,14 @@ func (h *Hero) updateItem(itemType string, itemLevel int) {
   }
 }
 
+func (h *Hero) updateTTL(seconds int) {
+  h.nextLevelAt = h.nextLevelAt.Add(time.Duration(seconds) * time.Second)
+}
+
 func (h *Hero) getTTL() int {
   return int(h.nextLevelAt.Sub(time.Now()).Seconds())
 }
 
 func (h *Hero) getTotalItems() int {
-  return h.Equipment..Weapon + h.Equipment..Tunic + h.Equipment..Shield + h.Equipment..Leggings + h.Equipment..Ring + h.Equipment..Gloves + h.Equipment..Boots + h.Equipment..Helm + h.Equipment..Charm + h.Equipment..Amulet
+  return h.Equipment.Weapon + h.Equipment.Tunic + h.Equipment.Shield + h.Equipment.Leggings + h.Equipment.Ring + h.Equipment.Gloves + h.Equipment.Boots + h.Equipment.Helm + h.Equipment.Charm + h.Equipment.Amulet
 }
