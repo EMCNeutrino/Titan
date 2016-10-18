@@ -9,6 +9,10 @@ apt-get -qq update
 echo -e "\n--- Install base packages ---\n"
 apt-get install -y python3 python3-dev python3-pip python3-setuptools
 
+echo -e "\n--- Install Docker ---\n"
+apt-get install -y docker.io
+usermod -aG docker ubuntu
+
 echo -e "\n--- Install MySQL specific packages and settings ---\n"
 debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWD"
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWD"
