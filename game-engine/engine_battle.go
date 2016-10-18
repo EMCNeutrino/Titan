@@ -9,13 +9,10 @@ import (
   log "github.com/Sirupsen/logrus"
 )
 
-const (
-  battleCooldown = time.Duration(1) * time.Minute
-  battleDistance = 5
-)
-
 // battle function implements the battle logic
 func (g *Game) checkBattles() {
+  var h1Score, h2Score, gain int
+  var message string
 
   // Shuffle heroes list
   heroesShuffle := make([]*Hero, len(g.heroes))
@@ -58,14 +55,25 @@ func (g *Game) checkBattles() {
         continue
       }
 
-      //TODO: battle logic
+      h1Score = rand.Intn(h1.getTotalItems())
+      h2Score = rand.Intn(h2.getTotalItems())
 
-      // H1 lost
+      if h1Score == h2Score {
+        message = fmt.Sprintf("%s and %s fought and tied.", h1.HeroName, h2.HeroName)
+      } else {
+        gain = int(math.Min(float64(h2.Level*battleGainMultiplier), battleMinGain))
+        if h1Score > h2Score {
+          message = fmt.Sprintf("%s has challenged %s in combat and won! %d seconds are removed from %s's clock.", h1.HeroName, h2.HeroName, gain, h1.HeroName)
+          h1.updateTTL(0 - gain)
+        } else {
+          message = fmt.Sprintf("%s has challenged %s in combat and lost! %d seconds are added to %s's clock.", h1.HeroName, h2.HeroName, gain, h1.HeroName)
+          h1.updateTTL(gain)
+        }
+      }
+
       h1.lastBattleAt = time.Now()
       h2.lastBattleAt = time.Now()
-      h1.updateTTL(1000)
-      h2.updateTTL(-1000)
-      message := fmt.Sprintf("%s fought to %s and lost. Incresing the time to the next level by %d seconds.", h1.HeroName, h2.HeroName, 1000)
+
       go g.sendEvent(message, h1, h2)
     }
   }

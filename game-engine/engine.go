@@ -10,14 +10,19 @@ import (
 )
 
 const (
-  xMax           = 500
-  yMax           = 500
-  xMin           = 0
-  yMin           = 0
-  levelUpSeconds = 600 //TODO: Change to 600
-  levelUpBase    = float64(1.16)
+  xMax                 = 500
+  yMax                 = 500
+  xMin                 = 0
+  yMin                 = 0
+  levelUpSeconds       = 600 //TODO: Change to 600
+  levelUpBase          = float64(1.16)
+  battleCooldown       = time.Duration(1) * time.Minute
+  battleDistance       = 100 //TODO: Tune it
+  battleMinGain        = 60  //TODO: Tune it
+  battleGainMultiplier = 20  //TODO: Tune it
 )
 
+// Game contains core information about the game engine
 type Game struct {
   startedAt        time.Time
   heroes           []*Hero
