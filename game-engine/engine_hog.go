@@ -40,7 +40,7 @@ func (g *Game) handOfGod() {
       log.Infof("[Engine] : Hand of Good : TTL after: %d", g.heroes[i].getTTL())
       log.Infof("[Hand of God] %s", message)
 
-      g.sendEvent(message, &g.heroes[i])
+      g.sendEvent(message, g.heroes[i])
 
     }
   }

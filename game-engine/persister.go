@@ -49,13 +49,20 @@ func SaveToDB(g *Game) error {
     if err != nil {
       log.Error(err)
     }
-    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
 
-    _, err = stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.token,
+    ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
+    res, err := stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.token,
       hero.Level, ttl, hero.Xpos, hero.Ypos,
       hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm, hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves, hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
     if err != nil {
       log.Error(err)
+    }
+
+    lastID, err := res.LastInsertId()
+    if err != nil {
+      log.Error(err)
+    } else {
+      hero.id = lastID
     }
   }
 
@@ -106,7 +113,7 @@ func LoadFromDB(g *Game) error {
     }
 
     hero.nextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
-    g.heroes = append(g.heroes, *hero)
+    g.heroes = append(g.heroes, hero)
 
   }
   err = rows.Err()

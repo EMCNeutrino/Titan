@@ -20,7 +20,7 @@ const (
 
 type Game struct {
   startedAt        time.Time
-  heroes           []Hero
+  heroes           []*Hero
   adminToken       string
   joinChan         chan JoinRequest
   activateHeroChan chan ActivateHeroRequest
@@ -38,7 +38,7 @@ func NewGame(adminToken string) (*Game, error) {
 
   game := &Game{
     startedAt:        time.Now(),
-    heroes:           []Hero{},
+    heroes:           []*Hero{},
     joinChan:         make(chan JoinRequest),
     activateHeroChan: make(chan ActivateHeroRequest),
     exitChan:         make(chan []byte),
@@ -75,23 +75,25 @@ func (g *Game) StartEngine() {
   for {
     select {
     case <-ticker.C:
+      log.Debug("[Ticker Main] Move heroes, check levels, battles")
       g.moveHeroes()
       g.checkLevels()
       //TODO: check battles
     case <-tickerHog.C:
+      log.Debug("[Ticker HoG] Hand of god event")
       g.handOfGod()
     case <-tickerDB.C:
-      log.Info("Saving game state to DB")
+      log.Debug("[Ticker DB] Saving game state to DB")
       if err := SaveToDB(g); err != nil {
         log.Error(err)
       }
     case req := <-g.joinChan:
-      log.Info("Join hero")
+      log.Info("[API Request] Join hero")
       success, message := g.joinHero(req.firstName, req.lastName, req.email, req.twitter, req.heroName, req.heroClass, req.TokenRequest.token)
       req.Response <- GameResponse{success: success, message: message}
       close(req.Response)
     case req := <-g.activateHeroChan:
-      log.Info("Activate hero")
+      log.Info("[API Request] Activate hero")
       success := g.activateHero(req.name, req.TokenRequest.token)
       req.Response <- GameResponse{success: success, message: ""}
       close(req.Response)
@@ -142,8 +144,15 @@ func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass
     Ypos: rand.Intn(yMax-yMin) + yMin,
   }
 
-  g.heroes = append(g.heroes, *hero)
-  log.Infof("Hero %s has been created, but will not play until it's activated.", hero.HeroName)
+  g.heroes = append(g.heroes, hero)
+
+  if err := SaveToDB(g); err != nil {
+    return false, "Error saving the hero"
+  }
+
+  message := fmt.Sprintf("Hero %s has been created, but will not play until it's activated.", hero.HeroName)
+  go g.sendEvent(message, hero)
+
   return true, fmt.Sprintf("Token: %s", hero.token)
 }
 
@@ -160,7 +169,10 @@ func (g *Game) activateHero(name, token string) bool {
   ttl := getTTLForLevel(1) // Time to level 1
   g.heroes[i].nextLevelAt = ttlToDatetime(ttl)
   g.heroes[i].Enabled = true
-  log.Infof("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
+
+  message := fmt.Sprintf("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
+  go g.sendEvent(message, g.heroes[i])
+
   return true
 }
 
@@ -188,13 +200,13 @@ func (g *Game) getHeroIndex(heroName string) int {
   return -1
 }
 
-func (g *Game) getHero(name string) (Hero, error) {
+func (g *Game) getHero(name string) (*Hero, error) {
   for _, hero := range g.heroes {
     if hero.HeroName == name {
       return hero, nil
     }
   }
-  return Hero{}, fmt.Errorf("Hero not found")
+  return &Hero{}, fmt.Errorf("Hero not found")
 }
 
 func (g *Game) sendEvent(message string, heroes ...*Hero) {
@@ -229,8 +241,8 @@ func (g *Game) checkLevels() {
 
       message := fmt.Sprintf("%s has attained level %d! Next level in %d seconds.", g.heroes[i].HeroName, level, ttl)
 
-      go g.sendEvent(message, &g.heroes[i])
-      go g.findItem(&g.heroes[i])
+      go g.sendEvent(message, g.heroes[i])
+      go g.findItem(g.heroes[i])
     }
   }
 }
