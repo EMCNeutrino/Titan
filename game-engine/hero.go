@@ -14,6 +14,8 @@ type Hero struct {
   Twitter      string `json:"twitter"`
   HeroName     string `json:"hero_name"`
   HeroClass    string `json:"hero_class"`
+  HeroRace     string `json:"hero_race"`
+  HeroTitle    string `json:"hero_title"`
   Enabled      bool   `json:"enabled"`
   TTL          int    `json:"ttl"`
   token        string

@@ -16,10 +16,13 @@ const (
   yMin                 = 0
   levelUpSeconds       = 600 //TODO: Change to 600
   levelUpBase          = float64(1.16)
-  battleCooldown       = time.Duration(1) * time.Minute
-  battleDistance       = 100 //TODO: Tune it
-  battleMinGain        = 60  //TODO: Tune it
-  battleGainMultiplier = 20  //TODO: Tune it
+  challengeCooldown = time.Duration(1) * time.Minute
+  challengeDistance = 3 //TODO: Tune it
+  challengeMinGain = 60  //TODO: Tune it
+  challengeGainMultiplier = 20  //TODO: Tune it
+  godsendMinGain   = 60        //TODO: Tune it
+  godsendGainMultiplier = 20   //TODO: Tune it
+
 )
 
 // Game contains core information about the game engine
@@ -83,7 +86,8 @@ func (g *Game) StartEngine() {
       log.Debug("[Ticker Main] Move heroes, check levels, battles")
       g.moveHeroes()
       g.checkLevels()
-      g.checkBattles()
+      g.CheckChallenge()
+      g.GodSend()
     case <-tickerHog.C:
       log.Debug("[Ticker HoG] Hand of god event")
       g.handOfGod()
@@ -148,7 +152,8 @@ func (g *Game) activateHero(name, token string) bool {
   g.heroes[i].nextLevelAt = ttlToDatetime(ttl)
   g.heroes[i].Enabled = true
 
-  message := fmt.Sprintf("Success! Hero %s has been activated and will reach level 1 in %d seconds.", g.heroes[i].HeroName, ttl)
+  var message = fmt.Sprintf("Success! %s, %s, of the %s race has joined Bacelona's Fantasy Realm. Next Level in %d seconds.",g.heroes[i].HeroName, g.heroes[i].HeroTitle, g.heroes[i].HeroRace, g.heroes[i].getTTL())
+
   go g.sendEvent(message, g.heroes[i])
 
   return true

@@ -7,6 +7,7 @@ import (
   log "github.com/Sirupsen/logrus"
 
   _ "github.com/go-sql-driver/mysql"
+  "fmt"
 )
 
 // GetDBConnection builds and returns the database connection
@@ -36,7 +37,7 @@ func SaveToDB(g *Game) error {
   defer db.Close()
 
   for _, hero := range g.heroes {
-    stmt, err := db.Prepare("INSERT INTO hero " +
+      stmt, err := db.Prepare("INSERT INTO hero " +
       "(player_name, player_lastname, hero_name, email, twitter, hclass, hero_online, token, hero_level, ttl, xpos, ypos, " +
       " ring, amulet, charm, weapon, helm, tunic, gloves, shield, leggings, boots " +
       ") " +
@@ -52,7 +53,7 @@ func SaveToDB(g *Game) error {
 
     ttl := int(hero.nextLevelAt.Sub(time.Now()).Seconds())
     res, err := stmt.Exec(hero.FirstName, hero.LastName, hero.HeroName, hero.Email, hero.Twitter, hero.HeroClass, hero.Enabled, hero.token,
-      hero.Level, ttl, hero.Xpos, hero.Ypos,
+      hero.Level, hero.HeroClass, hero.HeroTitle, ttl, hero.Xpos, hero.Ypos,
       hero.Equipment.Ring, hero.Equipment.Amulet, hero.Equipment.Charm, hero.Equipment.Weapon, hero.Equipment.Helm, hero.Equipment.Tunic, hero.Equipment.Gloves, hero.Equipment.Shield, hero.Equipment.Leggings, hero.Equipment.Boots)
     if err != nil {
       log.Error(err)
@@ -87,8 +88,10 @@ func LoadFromDB(g *Game) error {
     "COALESCE(twitter, '') AS twiter, " +
     "COALESCE(email, 'NoEmail') AS email, " +
     "hero_level,  " +
-    "COALESCE(hclass, '') AS hclass , ttl, " +
-    "hero_online, xpos, ypos, " +
+    "COALESCE(hclass, '') AS hclass , +" +
+    "COALESCE(race, '') AS race , +" +
+    "COALESCE(title, '') AS title , +" +
+    " ttl, hero_online, xpos, ypos, " +
     "IFNULL(weapon, 0), IFNULL(tunic, 0), IFNULL(shield, 0), IFNULL(leggings, 0), IFNULL(ring, 0), " +
     "IFNULL(gloves, 0), IFNULL(boots, 0), IFNULL(helm, 0), IFNULL(charm, 0) , IFNULL(amulet, 0) " +
     "total_equipment FROM hero")
@@ -103,7 +106,7 @@ func LoadFromDB(g *Game) error {
     var ttl int
 
     err = rows.Scan(&hero.id, &hero.HeroName, &hero.FirstName, &hero.LastName, &hero.token, &hero.Twitter, &hero.Email,
-      &hero.Level, &hero.HeroClass, &ttl, &hero.Enabled,
+      &hero.Level, &hero.HeroClass, &hero.HeroRace, &hero.HeroTitle, &ttl, &hero.Enabled,
       &hero.Xpos, &hero.Ypos, &hero.Equipment.Weapon, &hero.Equipment.Tunic, &hero.Equipment.Shield, &hero.Equipment.Leggings, &hero.Equipment.Ring, &hero.Equipment.Gloves,
       &hero.Equipment.Boots, &hero.Equipment.Helm, &hero.Equipment.Charm, &hero.Equipment.Amulet)
 
@@ -114,6 +117,10 @@ func LoadFromDB(g *Game) error {
 
     hero.nextLevelAt = time.Now().Add(time.Duration(ttl) * time.Second)
     g.heroes = append(g.heroes, hero)
+
+    //Message Realm
+    var message = fmt.Sprintf("%s, %s, of the %s race has joined Bacelona's Fantasy Realm. Next Level in %d seconds.",hero.HeroName, hero.HeroTitle, hero.HeroRace, hero.getTTL())
+    g.sendEvent(message, hero)
 
   }
   err = rows.Err()
