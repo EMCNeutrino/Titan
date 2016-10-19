@@ -15,17 +15,12 @@ from novaclient.v2 import quotas as nquotas
 from cinderclient.v2 import quotas as ccquota
 from cinderclient import client as cinder_client
 from neutronclient.v2_0 import client as neutron_client
-import pika
-import argparse
 import os
-import sys
-import logging
 import requests
-import json
 from os.path import join, dirname
 
 from random import randint
-from retry import retry
+from retrying import retry
 TEST_MODE = False
 
 @task
@@ -79,7 +74,7 @@ class Setup(object):
         self.lastname = lastname
         self.email = email
 
-    @retry()
+    @retry
     def start(self):
         self.__authenticate()
         account = self.__create_account(self.account)
@@ -95,7 +90,7 @@ class Setup(object):
         defaultproject=self.__get_project_by_name(self.default_project,domain_id=defaultdomain.id)
         monitoruser = self.__create_user(account=account, project=defaultproject, domain=defaultdomain)
         self.__grant_roles(monitoruser,account=account,  project=defaultproject, domain=defaultdomain, rolename="monitor")
-		
+
         self.__send_email(self.firstname,self.lastname,self.email)
 
     def __authenticate(self):
@@ -257,6 +252,3 @@ class Setup(object):
                 "text": body}
         request = requests.post(request_url, auth=('api', key), data=data,verify=False)
         logger.info("Finished sending Email to %s %s at email %s", self.firstname, self.lastname, self.email)
-
-
-
