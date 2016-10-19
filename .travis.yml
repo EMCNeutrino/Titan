@@ -27,3 +27,6 @@ deploy:
   on:
     repo: VxRackNeutrino/Hero
     branch: develop
+
+notifications:
+  slack: emccaspian:cR8v3N3cwtzCPMgwObikgDhR
