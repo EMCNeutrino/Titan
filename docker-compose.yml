@@ -1,13 +1,22 @@
 version: '2'
-services: 
-  game-engine:
+services:
+  engine:
     image: "emccorp/hero-engine"
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=titanuser:Neutrin0R0cks!@tcp(db:3306)/titandb
+    links:
+      - db
+  web:
+    image: "emccorp/hero-web"
     ports:
       - "80:8080"
     environment:
-      - DATABASE_URL=root:root@/titandb
+      - DATABASE_URL=mysql://titanuser:Neutrin0R0cks!@db:3306/titandb
+    links:
+      - db
   db:
     image: "emccorp/hero-db"
     environment:
-      - datavol=/data
-
+      - MYSQL_ROOT_PASSWORD=root
