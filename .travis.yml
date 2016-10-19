@@ -28,3 +28,8 @@ deploy:
   on:
     repo: VxRackNeutrino/Hero
     branch: develop
+
+notifications:
+  slack:
+    rooms:
+      - emccaspian:cR8v3N3cwtzCPMgwObikgDhR#general#pdt-cat-builds
