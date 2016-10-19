@@ -10,14 +10,19 @@ import (
 )
 
 const (
-  xMax           = 500
-  yMax           = 500
-  xMin           = 0
-  yMin           = 0
-  levelUpSeconds = 600 //TODO: Change to 600
-  levelUpBase    = float64(1.16)
+  xMax                 = 500
+  yMax                 = 500
+  xMin                 = 0
+  yMin                 = 0
+  levelUpSeconds       = 600 //TODO: Change to 600
+  levelUpBase          = float64(1.16)
+  battleCooldown       = time.Duration(1) * time.Minute
+  battleDistance       = 100 //TODO: Tune it
+  battleMinGain        = 60  //TODO: Tune it
+  battleGainMultiplier = 20  //TODO: Tune it
 )
 
+// Game contains core information about the game engine
 type Game struct {
   startedAt        time.Time
   heroes           []*Hero
@@ -78,7 +83,7 @@ func (g *Game) StartEngine() {
       log.Debug("[Ticker Main] Move heroes, check levels, battles")
       g.moveHeroes()
       g.checkLevels()
-      //TODO: check battles
+      g.checkBattles()
     case <-tickerHog.C:
       log.Debug("[Ticker HoG] Hand of god event")
       g.handOfGod()
@@ -115,34 +120,7 @@ func (g *Game) joinHero(firstName, lastName, email, twitter, heroName, heroClass
     return false, "This Hero name is already taken"
   }
 
-  hero := &Hero{
-    FirstName:   firstName,
-    LastName:    lastName,
-    Email:       email,
-    Twitter:     twitter,
-    HeroName:    heroName,
-    HeroClass:   heroClass,
-    Enabled:     false,
-    token:       randToken(),
-    Level:       0,
-    nextLevelAt: ttlToDatetime(99999 * time.Hour),
-    CreatedAt:   time.Now(),
-    Equipment: &Equipment{
-      Ring:     0,
-      Amulet:   0,
-      Charm:    0,
-      Weapon:   0,
-      Helm:     0,
-      Tunic:    0,
-      Gloves:   0,
-      Shield:   0,
-      Leggings: 0,
-      Boots:    0,
-      Total:    0,
-    },
-    Xpos: rand.Intn(xMax-xMin) + xMin,
-    Ypos: rand.Intn(yMax-yMin) + yMin,
-  }
+  hero := NewHero(firstName, lastName, email, twitter, heroName, heroClass)
 
   g.heroes = append(g.heroes, hero)
 

@@ -2,10 +2,15 @@ package main
 
 import (
   "fmt"
-  "log"
   "os"
   "runtime"
+
+  log "github.com/Sirupsen/logrus"
 )
+
+func init() {
+  log.SetLevel(log.DebugLevel)
+}
 
 func main() {
 

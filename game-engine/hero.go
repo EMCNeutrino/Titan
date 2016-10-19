@@ -1,25 +1,29 @@
 package main
 
-import "time"
+import (
+  "math/rand"
+  "time"
+)
 
 // Hero struct contains information about each Hero
 type Hero struct {
-  id          int64
-  FirstName   string `json:"first_name"`
-  LastName    string `json:"last_name"`
-  Email       string `json:"email"`
-  Twitter     string `json:"twitter"`
-  HeroName    string `json:"hero_name"`
-  HeroClass   string `json:"hero_class"`
-  Enabled     bool   `json:"enabled"`
-  TTL         int    `json:"ttl"`
-  token       string
-  Level       int `json:"level"`
-  nextLevelAt time.Time
-  CreatedAt   time.Time  `json:"created_at"`
-  Equipment   *Equipment `json:"equipment"`
-  Xpos        int        `json:"x_pos"`
-  Ypos        int        `json:"y_pos"`
+  id           int64
+  FirstName    string `json:"first_name"`
+  LastName     string `json:"last_name"`
+  Email        string `json:"email"`
+  Twitter      string `json:"twitter"`
+  HeroName     string `json:"hero_name"`
+  HeroClass    string `json:"hero_class"`
+  Enabled      bool   `json:"enabled"`
+  TTL          int    `json:"ttl"`
+  token        string
+  Level        int `json:"level"`
+  nextLevelAt  time.Time
+  CreatedAt    time.Time  `json:"created_at"`
+  Equipment    *Equipment `json:"equipment"`
+  Xpos         int        `json:"x_pos"`
+  Ypos         int        `json:"y_pos"`
+  lastBattleAt time.Time
 }
 
 type Equipment struct {
@@ -92,6 +96,40 @@ func (h *Hero) updateItem(itemType string, itemLevel int) {
   case "amulet":
     h.Equipment.Amulet = itemLevel
   }
+}
+
+// NewHero initializes a Hero struct and returns it
+func NewHero(firstName, lastName, email, twitter, heroName, heroClass string) *Hero {
+  h := &Hero{
+    FirstName:   firstName,
+    LastName:    lastName,
+    Email:       email,
+    Twitter:     twitter,
+    HeroName:    heroName,
+    HeroClass:   heroClass,
+    Enabled:     false,
+    token:       randToken(),
+    Level:       0,
+    nextLevelAt: ttlToDatetime(99999 * time.Hour),
+    CreatedAt:   time.Now(),
+    Equipment: &Equipment{
+      Ring:     0,
+      Amulet:   0,
+      Charm:    0,
+      Weapon:   0,
+      Helm:     0,
+      Tunic:    0,
+      Gloves:   0,
+      Shield:   0,
+      Leggings: 0,
+      Boots:    0,
+      Total:    0,
+    },
+    Xpos:         rand.Intn(xMax-xMin) + xMin,
+    Ypos:         rand.Intn(yMax-yMin) + yMin,
+    lastBattleAt: time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+  }
+  return h
 }
 
 func (h *Hero) updateTTL(seconds int) {

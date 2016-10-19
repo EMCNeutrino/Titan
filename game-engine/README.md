@@ -26,6 +26,12 @@ And, optionally, the admin token used to issue API requests that require admin p
 export ADMIN_TOKEN=1234
 ```
 
+Install the Golang dependencies.
+
+```
+go get -v ./...
+```
+
 Then, you can run the Game Engine with the following command.
 
 ```
