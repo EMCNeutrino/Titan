@@ -1,0 +1,33 @@
+#
+# the heroadmin user is created with following properties on Neutrino UI
+# Account/Domain roles:  Account Monitor (monitor)
+# Project project: project_hero
+# Primary Project Roles: admin, openstack_admin, heat_stack_owner
+#
+
+# Modify HEAT_* parameters if you want to run the heat template to create
+# another set 
+
+unset ${!OS_*}
+export NEUTRINO_VIP=10.246.151.96
+export OS_AUTH_URL=https://${NEUTRINO_VIP}:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_USERNAME=heroadmin
+export OS_PASSWORD=admin123
+export OS_PROJECT_NAME=project_hero
+export OS_USER_DOMAIN_NAME=hero
+export OS_PROJECT_DOMAIN_NAME=hero
+
+unset ${!HEAT_*}
+export HEAT_PREFIX=hero
+export HEAT_IMAGE_ID_TRUSTY=${HEAT_PREFIX}-ubuntu-14.04
+export HEAT_IMAGE_ID_XENIAL=${HEAT_PREFIX}-ubuntu-16.04
+export HEAT_FLAVOR_ID=p3.large
+export HEAT_IMAGE_LOCATION_TRUSTY=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+export HEAT_IMAGE_LOCATION_XENIAL=https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+export HEAT_KEY_ID=${HEAT_PREFIX}-keypair
+export HEAT_PUBLIC_NETWORK=public
+export HEAT_NET_ID=${HEAT_PREFIX}-network
+export HEAT_SECGROUP_ID=${HEAT_PREFIX}-secgroup
+export HEAT_DNS_SERVERS="10.247.134.40,10.247.134.41"
+
