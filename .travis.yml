@@ -30,6 +30,4 @@ deploy:
     branch: develop
 
 notifications:
-  slack:
-    rooms:
-      - emccaspian:cR8v3N3cwtzCPMgwObikgDhR#general#pdt-cat-builds
+  slack: emccaspian:cR8v3N3cwtzCPMgwObikgDhR
