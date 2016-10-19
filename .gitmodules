@@ -1,3 +1,6 @@
 [submodule "hero-engine"]
 	path = hero-engine
 	url = git@github.com:VxRackNeutrino/hero-engine.git
+[submodule "hero-web"]
+	path = hero-web
+	url = git@github.com:VxRackNeutrino/hero-web.git
