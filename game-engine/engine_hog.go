@@ -20,7 +20,7 @@ func (g *Game) handOfGod() {
       var message string
       var timeCalculation = int(float32((rand.Intn(71) + 5)) / 100 * float32((g.heroes[i].Level+1)*3600))
 
-      log.Infof("[Hand of Good]: Hero: %s.  timeCalculation: %d", timeCalculation)
+      log.Infof("[Hand of God]: Hero: %s.  timeCalculation: %d", timeCalculation)
 
       if rand.Intn(10) >= 3 {
         // Good outcome
@@ -37,7 +37,7 @@ func (g *Game) handOfGod() {
         g.heroes[i].updateTTL(timeCalculation)
       }
 
-      log.Infof("[Engine] : Hand of Good : TTL after: %d", g.heroes[i].getTTL())
+      log.Infof("[Engine_hog] : Hand of Good : TTL after: %d", g.heroes[i].getTTL())
       log.Infof("[Hand of God] %s", message)
 
       g.sendEvent(message, g.heroes[i])

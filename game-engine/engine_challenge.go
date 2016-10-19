@@ -10,7 +10,7 @@ import (
 )
 
 // battle function implements the battle logic
-func (g *Game) checkBattles() {
+func (g *Game) CheckChallenge() {
   var h1Score, h2Score, gain int
   var message string
 
@@ -28,9 +28,9 @@ func (g *Game) checkBattles() {
       continue
     }
 
-    if h1.lastBattleAt.Add(battleCooldown).After(time.Now()) {
+    if h1.lastBattleAt.Add(challengeCooldown).After(time.Now()) {
       // Hero fought very recently
-      log.Debugf("[Battle] %s fought very recently. Skipping", h1.HeroName)
+      log.Debugf("[Challenge] %s fought very recently. Skipping", h1.HeroName)
       continue
     }
 
@@ -43,30 +43,30 @@ func (g *Game) checkBattles() {
         continue
       }
 
-      if h2.lastBattleAt.Add(battleCooldown).After(time.Now()) {
+      if h2.lastBattleAt.Add(challengeCooldown).After(time.Now()) {
         // Hero fought very recently
-        log.Debugf("[Battle] %s fought very recently. Skipping", h2.HeroName)
+        log.Debugf("[Challenge] %s fought very recently. Skipping", h2.HeroName)
         continue
       }
 
-      if heroesDistance(h1, h2) > battleDistance {
+      if heroesDistance(h1, h2) > challengeDistance {
         // Too far away
-        log.Debugf("[Battle] %s and %s are too far away.", h1.HeroName, h2.HeroName)
+        log.Debugf("[Challenge] %s and %s are too far away.", h1.HeroName, h2.HeroName)
         continue
       }
 
-      h1Score = rand.Intn(h1.getTotalItems())
-      h2Score = rand.Intn(h2.getTotalItems())
+      h1Score = rand.Intn(h1.getTotalItems()) + h1.Level
+      h2Score = rand.Intn(h2.getTotalItems()) + h2.Level
 
       if h1Score == h2Score {
         message = fmt.Sprintf("%s and %s fought and tied.", h1.HeroName, h2.HeroName)
       } else {
-        gain = int(math.Min(float64(h2.Level*battleGainMultiplier), battleMinGain))
+        gain = int(math.Min(float64(h2.Level* challengeGainMultiplier), challengeMinGain))
         if h1Score > h2Score {
-          message = fmt.Sprintf("%s has challenged %s in combat and won! %d seconds are removed from %s's clock.", h1.HeroName, h2.HeroName, gain, h1.HeroName)
+          message = fmt.Sprintf("%s, [Level:%d / Equipment:%d] has challenged %s [Level:%d / Equipment:%d] in combat and won! %d seconds are removed from %s's clock.", h1.HeroName, h1.Level, h1.getTotalItems(), h2.HeroName, h2.Level, h2.getTotalItems(), gain, h1.HeroName)
           h1.updateTTL(0 - gain)
         } else {
-          message = fmt.Sprintf("%s has challenged %s in combat and lost! %d seconds are added to %s's clock.", h1.HeroName, h2.HeroName, gain, h1.HeroName)
+          message = fmt.Sprintf("%s [Level:%d / Equipment:%d] has challenged %s [Level:%d / Equipment:%d] in combat and lost! %d seconds are added to %s's clock.", h1.HeroName, h1.Level, h1.getTotalItems(), h2.HeroName, h2.Level, h2.getTotalItems(), gain, h1.HeroName)
           h1.updateTTL(gain)
         }
       }
