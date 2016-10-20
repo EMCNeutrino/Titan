@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_URL=titanuser:Neutrin0R0cks!@tcp(db:3306)/titandb
+      - ADMIN_TOKEN=1234
     links:
       - db
   web:
@@ -14,8 +15,11 @@ services:
       - "80:8080"
     environment:
       - DATABASE_URL=mysql://titanuser:Neutrin0R0cks!@db:3306/titandb
+      - HERO_API=http://engine:8080
+      - HERO_ADMIN_TOKEN=1234
     links:
       - db
+      - engine
   db:
     image: "emccorp/hero-db"
     environment:
