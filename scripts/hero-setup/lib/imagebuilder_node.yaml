@@ -92,6 +92,8 @@ resources:
             cd $IMAGEBUILDER_DIR/diskimage-builder/elements
             cp -rp ubuntu ubuntu-hero
             cat >> ubuntu-hero/pre-install.d/02-hero << EOF
+            #!/bin/bash
+
             apt-get update
             apt-get install -y git zip curl wget httpie
             apt-get install -y sysv-rc-conf
@@ -119,7 +121,7 @@ resources:
             DIB_RELEASE=trusty disk-image-create -a amd64 vm base ubuntu-hero cloud-init-nocloud -o hero-ubuntu.qcow2
             EOF
  
-            chmod +x ubuntu-xenial-hero.sh 
+            chmod +x hero-ubuntu.sh 
 
             # Notify Heat we're done
 #            wc_notify --data-binary '{"status": "SUCCESS"}'
