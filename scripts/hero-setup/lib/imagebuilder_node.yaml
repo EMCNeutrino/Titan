@@ -48,7 +48,7 @@ resources:
     properties:
       key_name: { get_param: key_name }
       name: 
-        list_join: ["-", [{get_param: name }, "client"]]
+        list_join: ["-", [{get_param: name }, "imagebuilder"]]
       image: { get_param: image }
       networks:
         - port: { get_resource: port }
@@ -69,7 +69,9 @@ resources:
             apt-get install -y git zip curl wget httpie
 
             # install python packages
-            apt-get install -y python3 python3-dev python3-pip python3-setuptools
+            apt-get install -y python python-dev python-pip python-setuptools
+
+            easy_install pip
 
             # pull Hero from github
             cd ~
@@ -77,7 +79,48 @@ resources:
             git config --global http.sslVerify false
             git config --global url."https://".insteadOf git:// 
             git clone -b develop --recursive https://github.com/VxRackNeutrino/Hero
-          
+
+            # image builder
+            export IMAGEBUILDER_DIR=~/imagebuilder
+            mkdir -p $IMAGEBUILDER_DIR
+            cd $IMAGEBUILDER_DIR
+            git clone https://github.com/openstack/diskimage-builder
+            pip install pytz
+            pip install diskimage-builder
+            apt-get install -y qemu-utils debootstrap
+
+            cd $IMAGEBUILDER_DIR/diskimage-builder/elements
+            cp -rp ubuntu ubuntu-hero
+            cat >> ubuntu-hero/pre-install.d/02-hero << EOF
+            apt-get update
+            apt-get install -y git zip curl wget httpie
+            apt-get install -y sysv-rc-conf
+
+            {
+              echo "#!/bin/bash"
+              echo ""
+              echo "su - ubuntu << EOF"
+              echo "cd /home/ubuntu"
+              echo "git config --global http.sslVerify false"
+              echo "git config --global url."https://".insteadOf git://"
+              echo "git clone -b develop --recursive https://github.com/VxRackNeutrino/Hero.git"
+              echo "EOF"
+            } > /etc/init.d/hero-init
+            chmod 755 /etc/init.d/hero-init
+            sysv-rc-conf hero-init on
+
+            EOF
+
+            cd $IMAGEBUILDER_DIR/
+            cat >> hero-ubuntu.sh << EOF
+            #!/bin/bash
+            export ELEMENTS_PATH=$IMAGEBUILDER_DIR/diskimage-builder/elements
+            set -ux
+            DIB_RELEASE=trusty disk-image-create -a amd64 vm base ubuntu-hero cloud-init-nocloud -o hero-ubuntu.qcow2
+            EOF
+ 
+            chmod +x ubuntu-xenial-hero.sh 
+
             # Notify Heat we're done
 #            wc_notify --data-binary '{"status": "SUCCESS"}'
     
@@ -88,16 +131,16 @@ resources:
       security_groups:
         - { get_param: security_group }
 
-#  floating_ip:
-#    type: OS::Neutron::FloatingIP
-#    properties:
-#      floating_network: { get_param: public_network }
-#
-#  floating_ip_assoc:
-#    type: OS::Neutron::FloatingIPAssociation
-#    properties:
-#      floatingip_id: { get_resource: floating_ip }
-#      port_id: { get_resource: port }
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+
+  floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: { get_resource: port }
 
 outputs:
 #  fip:
