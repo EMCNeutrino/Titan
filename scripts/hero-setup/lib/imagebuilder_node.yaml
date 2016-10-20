@@ -113,6 +113,8 @@ resources:
 
             EOF
 
+            chmod 755 $IMAGEBUILDER_DIR/diskimage-builder/elements/ubuntu-hero/pre-install.d/02-hero
+
             cd $IMAGEBUILDER_DIR/
             cat >> hero-ubuntu.sh << EOF
             #!/bin/bash
