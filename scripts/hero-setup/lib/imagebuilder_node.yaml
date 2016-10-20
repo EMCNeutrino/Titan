@@ -118,7 +118,7 @@ resources:
             #!/bin/bash
             export ELEMENTS_PATH=$IMAGEBUILDER_DIR/diskimage-builder/elements
             set -ux
-            DIB_RELEASE=trusty disk-image-create -a amd64 vm base ubuntu-hero cloud-init-nocloud -o hero-ubuntu.qcow2
+            DIB_RELEASE=trusty disk-image-create -a amd64 vm ubuntu-hero -o hero-ubuntu.qcow2
             EOF
  
             chmod +x hero-ubuntu.sh 
