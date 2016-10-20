@@ -9,7 +9,7 @@
 # another set 
 
 unset ${!OS_*}
-export NEUTRINO_VIP=10.246.151.96
+export NEUTRINO_VIP=10.246.151.32
 export OS_AUTH_URL=https://${NEUTRINO_VIP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_USERNAME=heroadmin
@@ -20,8 +20,8 @@ export OS_PROJECT_DOMAIN_NAME=hero
 
 unset ${!HEAT_*}
 export HEAT_PREFIX=hero
-export HEAT_IMAGE_ID_TRUSTY=${HEAT_PREFIX}-ubuntu-14.04
-export HEAT_IMAGE_ID_XENIAL=${HEAT_PREFIX}-ubuntu-16.04
+export HEAT_IMAGE_ID_TRUSTY=ubuntu-14.04
+export HEAT_IMAGE_ID_XENIAL=ubuntu-16.04
 export HEAT_FLAVOR_ID=p3.large
 export HEAT_IMAGE_LOCATION_TRUSTY=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
 export HEAT_IMAGE_LOCATION_XENIAL=https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
