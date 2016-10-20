@@ -7,6 +7,7 @@ services:
       - ADMIN_TOKEN=1234
     links:
       - db
+    command: ./wait-for-it.sh -t 60 db:3306 -- app
   web:
     image: "emccorp/hero-web"
     environment:
@@ -20,6 +21,7 @@ services:
       - "traefik.backend=heroweb"
       - "traefik.frontend.rule=Host:localhost"
       - "traefik.port=8080"
+    command: ./wait-for-it.sh -t 60 db:3306 -- gunicorn hero.wsgi -b 0.0.0.0:8080 --log-file -
   db:
     image: "emccorp/hero-db"
     environment:
