@@ -6,7 +6,7 @@ source ./openrc
 
 set -x
 
-heat --insecure stack-update -f init.yaml \
+heat --insecure stack-create -f init.yaml \
      -e lib/env.yaml \
      -P "image_id_trusty=$HEAT_IMAGE_ID_TRUSTY" \
      -P "image_id_xenial=$HEAT_IMAGE_ID_XENIAL" \
