@@ -14,6 +14,7 @@ heat --insecure stack-create -f hero-service.yaml \
      -P "net_id=$HEAT_NET_ID" \
      -P "name=$HEAT_PREFIX" \
      -P "image=$HEAT_IMAGE_ID_XENIAL" \
+     -P "image_trusty=$HEAT_IMAGE_ID_TRUSTY" \
      -P "flavor=$HEAT_FLAVOR_ID" \
      -P "public_network=$HEAT_PUBLIC_NETWORK" \
      -P "count=$COUNT" \
