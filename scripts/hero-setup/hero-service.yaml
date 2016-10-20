@@ -9,11 +9,6 @@ parameters:
     type: number
     default: 1
 
-  client_count:
-    description: Number of VMs
-    type: number
-    default: 1
-
   name:
     type: string
     description: Name of VM prefix
@@ -21,11 +16,6 @@ parameters:
   flavor:
     type: string
     description: name of the flavor
-
-  client_flavor:
-    type: string
-    description: name of the flavor
-    default: m1.tiny
 
   public_network:
     type: string
@@ -124,27 +114,6 @@ resources:
                 $name: { get_param: name }
                 $index: "%index%"
 
-  client_node:
-    type: OS::Heat::ResourceGroup
-    properties:
-      count: { get_param: client_count}
-      resource_def:
-        type: Lib::MSG::ClientNode
-        properties:
-          image: { get_param: image }
-          flavor: {get_param: client_flavor }
-          key_name: {get_param: key_name}
-          net_id: { get_param: net_id }
-          public_network: { get_param: public_network }
-          security_group: { get_param: security_group }
-          name:
-            str_replace:
-              template:
-                $name-$index
-              params:
-                $name: { get_param: name }
-                $index: "%index%"
-
   imagebuilder_node:
     type: OS::Heat::ResourceGroup
     properties:
@@ -168,8 +137,6 @@ resources:
 
 
 outputs:
-  mysql_fip:
-    value: {get_attr: [mysql_node, fip] }
   mysql_ip:
     value: {get_attr: [mysql_node, ip] }
 
