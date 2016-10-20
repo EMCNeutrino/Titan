@@ -77,14 +77,10 @@ resources:
         str_replace:
           params:
             __private_key__: { get_param: private_key }
-            __fip__: { get_attr: [floating_ip, floating_ip_address] }
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
             
-            # verify parameters passed from heat template
-            echo "export FIP=""__fip__" > /tmp/fip.txt
-
             # mount volume
             echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/vdb
             mkdir /data
@@ -158,9 +154,9 @@ resources:
 
 
 outputs:
-  fip:
-    description: floating ip of the instance
-    value: { get_attr: [floating_ip, floating_ip_address] }
+#  fip:
+#    description: floating ip of the instance
+#    value: { get_attr: [floating_ip, floating_ip_address] }
   ip:
     description: The IP address of the instance.
     value: { get_attr: [instance, first_address] }
