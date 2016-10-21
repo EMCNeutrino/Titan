@@ -75,7 +75,7 @@ resources:
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
-            
+            set -x
             export ADMIN_TOKEN=__admin_token__
 
             # verify parameters passed from heat template
@@ -148,9 +148,27 @@ resources:
             DOCKER_SCRIPT=~/start-engine-docker.sh
             {
                 echo "export DATABASE_URL='"${DATABASE_URL}"'"
+                echo "export ADMIN_TOKEN='"${ADMIN_TOKEN}"'"
                 echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -e ADMIN_TOKEN=\${ADMIN_TOKEN} -p 0.0.0.0:80:8080 emccorp/hero-engine"
             } > $DOCKER_SCRIPT
             chmod +x $DOCKER_SCRIPT
+
+            LIMIT=30
+            COUNT=0
+
+            while [ "$COUNT" -le "$LIMIT" ]
+            do
+               echo "`date`: wait for mysql server to start"
+               nc -zv ${MYSQL_IP} 3306
+               if [ $? -ne 0 ]
+               then
+                  sleep 10
+               else
+                  break
+               fi
+               COUNT=`expr $COUNT + 1`
+            done
+
 
             $DOCKER_SCRIPT
    
