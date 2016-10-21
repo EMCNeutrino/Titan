@@ -8,5 +8,5 @@ setup(
     license='MIT',
     author='DellEMC',
     author_email='',
-    description='Hero Client'
+    description='Hero Client', requires=['requests']
 )
