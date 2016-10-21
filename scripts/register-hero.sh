@@ -8,3 +8,5 @@ export HERO_NAME=${HERO_NAME}
 export HERO_EMAIL=${HERO_EMAIL}
 export HERO_TWITTER${HERO_TWITTER}
 EOF
+
+python /home/ubuntu/Hero/clients/python/Hero-Bot-Client.py
