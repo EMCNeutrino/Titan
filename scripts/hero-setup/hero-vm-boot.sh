@@ -8,6 +8,7 @@ export OS_IDENTITY_API_VERSION=3
 export OS_USERNAME=heroadmin
 export OS_PASSWORD=admin123
 export OS_PROJECT_NAME=project_hero
+export OS_TENANT_NAME=project_hero
 export OS_USER_DOMAIN_NAME=hero
 export OS_PROJECT_DOMAIN_NAME=hero
 

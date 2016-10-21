@@ -4,7 +4,7 @@ unset ${!OS_*}
 
 set -u
 
-NEUTRINO_VIP=${1:-10.246.151.96}
+NEUTRINO_VIP=${1:-10.246.151.32}
 AUTH_URL=https://${NEUTRINO_VIP}:35357/v3
 DOMAIN=default
 ADMIN_USER=admin
