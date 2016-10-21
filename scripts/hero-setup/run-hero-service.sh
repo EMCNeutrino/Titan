@@ -2,13 +2,14 @@
 
 ARG=$1
 COUNT=${ARG:-1}
+ACTION=${HEAT_ACTION:-create}
 
 set -ue
 
 source ./openrc
 
 set -x
-heat --insecure stack-create -f hero-service.yaml \
+heat --insecure stack-${ACTION} -f hero-service.yaml \
      -e lib/env.yaml \
      -P "key_name=$HEAT_KEY_ID" \
      -P "net_id=$HEAT_NET_ID" \
@@ -20,5 +21,6 @@ heat --insecure stack-create -f hero-service.yaml \
      -P "count=$COUNT" \
      -P "security_group=$HEAT_SECGROUP_ID" \
      -P "neutrino_vip=$NEUTRINO_VIP" \
+     -P "admin_password=$ADMIN_PASSWORD" \
      ${HEAT_PREFIX}-services
 set +x
