@@ -10,6 +10,7 @@
 
 unset ${!OS_*}
 export NEUTRINO_VIP=10.246.151.32
+export ADMIN_PASSWORD=admin123
 export OS_AUTH_URL=https://${NEUTRINO_VIP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_USERNAME=heroadmin
