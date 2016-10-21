@@ -9,7 +9,7 @@ services:
       - db
     command: ./wait-for-it.sh -t 60 db:3306 -- app
   web:
-    image: "emccorp/hero-web"
+    image: "emccorp/hero-web:latest"
     environment:
       - DATABASE_URL=mysql://titanuser:Neutrin0R0cks!@db:3306/titandb
       - HERO_API=http://engine:8080
@@ -37,3 +37,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
       - web
+  watchtower:
+    image: "centurylink/watchtower"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
