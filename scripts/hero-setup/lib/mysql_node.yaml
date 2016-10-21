@@ -80,7 +80,12 @@ resources:
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
-            
+                        
+            ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`           
+                         
+            cat >> /etc/hosts << EOF
+            $ip `hostname`
+            EOF
             # mount volume
             echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/vdb
             mkdir /data
@@ -123,7 +128,6 @@ resources:
             service apparmor restart
             
             # bind mysql to ip  
-            ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`           
             sed -i -e "s|bind-address.*|bind-address  = ${ip}|" /etc/mysql/mysql.conf.d/mysqld.cnf
 
             service mysql start

@@ -62,6 +62,12 @@ resources:
           template: |
             #!/bin/bash
             
+            ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`
+
+            cat >> /etc/hosts << EOF
+            $ip `hostname`
+            EOF
+
             # update
             apt-get update
 

@@ -78,6 +78,13 @@ resources:
           template: |
             #!/bin/bash
             
+            ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`
+
+            cat >> /etc/hosts << EOF
+            $ip `hostname`
+            EOF
+
+
             # verify parameters passed from heat template
             echo "export FIP=""__fip__" > /tmp/fip.txt
             NEUTRINO_VIP=__neutrino_vip__

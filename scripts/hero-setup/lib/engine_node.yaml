@@ -68,7 +68,6 @@ resources:
         str_replace:
           params:
             __fip__: { get_attr: [floating_ip, floating_ip_address] }
-#            __mysql_ip__: { get_param: mysql_ip }
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
@@ -81,6 +80,13 @@ resources:
             MYSQL_IP=${mysql_ip//[\"\[\] ()]}
 
             echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" > /etc/apt/sources.list.d/docker.list
+
+            ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`
+
+            cat >> /etc/hosts << EOF
+            $ip `hostname`
+            EOF
+
 
             # update
             apt-get update
