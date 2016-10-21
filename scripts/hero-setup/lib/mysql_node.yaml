@@ -87,6 +87,9 @@ resources:
             mkfs.ext4 /dev/vdb1
             mount /dev/vdb1 /data
 
+            cat >> /etc/fstab << EOF
+            /dev/vdb1  /data   auto    defaults,comment=data   0   2
+            EOF
             # update
             apt-get -q update
 
