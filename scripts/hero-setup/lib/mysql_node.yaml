@@ -122,8 +122,9 @@ resources:
 
             # move titandb to /data/directory
             service mysql stop
-            mv /var/lib/mysql/titandb /data
-            ln -s /data/titandb /var/lib/mysql
+            mkdir -p /data/mysql
+            mv /var/lib/mysql/titandb /data/mysql
+            ln -s /data/mysql/titandb /var/lib/mysql
             sed -i -e "/mysqld {/a \ \ /data/** rw," /etc/apparmor.d/usr.sbin.mysqld
             service apparmor restart
             
