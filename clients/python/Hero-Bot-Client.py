@@ -269,19 +269,21 @@ def Get_hero(heros):
 
     return heros[selected]
 
-def register_hero(hero_first_name, hero_last_name, hero_name, hero_email):
+def register_hero(player_first_name, player_last_name, hero_name, hero_email):
     """
     Register a hero
-    :param hero_first_name:The Hero's first name
-    :param hero_last_name:The Hero's last name
+    :param player_first_name:The Hero's first name
+    :param player_last_name:The Hero's last name
     :param hero_name:The Hero's name
     :param hero_email:The Hero's email
     :return:The Hero authentication Token
     """
 
+    logger.info("Player: {0} {1} | Hero: {2} | Email: {3}".format(player_first_name, player_last_name, hero_name, hero_email))
+
     # POST with parameters
     response = requests.post(engine_url, headers={'X-Auth-Token': auth_token},
-                             params={'firstName': hero_first_name, 'lastName': hero_last_name, 'heroName': hero_name,
+                             params={'firstName': player_first_name, 'lastName': player_last_name, 'heroName': hero_name,
                                      'heroClass': hero_class, 'email': hero_email})
 
     team_auth = json.dumps(response.text)
@@ -352,7 +354,7 @@ class hero:
     def set_total_equipment(self):
 
         total_equipment = self.weapon + self.tunic + self.shield + self.leggings + self.ring + self.gloves + self.boots + self.helm + self.charm + self.amulet
-        logger.info("Total Equipment: {0}".format(total_equipment))
+        #logger.info("Total Equipment: {0}".format(total_equipment))
 
 
 def main():
@@ -373,10 +375,12 @@ def main():
 
     Load_Heros(100)
 
-    logger.info("Hero List: {0}".format(len(heros)))
+    logger.info("Heros created: {0}".format(len(heros)))
 
     selected = random.randint(1, len(heros))
     myhero = heros[selected]
+
+    logger.info("Heros selectedd: {0}".format(myhero))
 
     # register a Hero
     token = register_hero(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email)
