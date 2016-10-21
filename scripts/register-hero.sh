@@ -1,12 +1,11 @@
 #!/bin/bash
 
-cat >> /home/ubuntu/hero-env-from-user << EOF
-export HERO_FIRST_NAME=${HERO_FIRST_NAME}
-export HERO_LAST_NAME=${HERO_LAST_NAME}
-export HERO_NAME=${HERO_NAME}
-export HERO_EMAIL=${HERO_EMAIL}
-export HERO_TWITTER=${HERO_TWITTER}
-export HERO_TOKEN=${HERO_TOKEN}
-EOF
+echo "HERO_FIRST_NAME=${HERO_FIRST_NAME}"
+echo "HERO_LAST_NAME=${HERO_LAST_NAME}"
+echo "HERO_NAME=${HERO_NAME}"
+echo "HERO_EMAIL=${HERO_EMAIL}"
+echo "HERO_TWITTER=${HERO_TWITTER}"
+echo "HERO_TOKEN=${HERO_TOKEN}"
+echo "HERO_ENGINE_IP=${HERO_ENGINE_IP}"
 
-python /home/ubuntu/Hero/clients/python/Hero-Bot-Client.py > register-hero.log 2>&1 &
+python /home/ubuntu/Hero/clients/python/Hero-Bot-Client.py
