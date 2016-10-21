@@ -2,13 +2,14 @@
 # Hero Bot Client: Register Hero with Game-controller
 
 import json
-import random
 import logging.config
 import os
-import requests
-import settings
+import random
 import uuid
 
+import requests
+
+import settings
 
 # Logging Initialization
 logging.config.dictConfig(settings.NEUTRINO_HEROS_LOGGING)
@@ -358,8 +359,6 @@ class hero:
 
 
 def main():
-    import os
-
     #parser = argparse.ArgumentParser(
     #    description='IP address of the the Game Controller.')
     #parser.add_argument('--ip', nargs='+', help='The IP of the Game Controller. Example: 10.1.0.4',
