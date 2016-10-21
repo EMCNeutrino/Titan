@@ -2,8 +2,6 @@
 
 Neutrino Heroes is a [microservices](http://en.wikipedia.org/wiki/Microservices) application that enables to play Idle RPG using VMs in an OpenStack environment.
 
-[![Build Status](https://travis-ci.org/VxRackNeutrino/Hero.svg?branch=develop)](https://travis-ci.org/VxRackNeutrino/Hero)
-
 ## Support
 
 Please file bugs and issues on the Github issues page for this project. This is to help keep track and document everything related to this repo.
