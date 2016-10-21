@@ -76,7 +76,7 @@ resources:
           template: |
             #!/bin/bash
             
-            ADMIN_TOKEN=__admin_token__
+            export ADMIN_TOKEN=__admin_token__
 
             # verify parameters passed from heat template
             echo "FIP=""__fip__" > /tmp/fip.txt
