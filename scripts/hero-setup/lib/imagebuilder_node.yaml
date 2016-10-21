@@ -2,6 +2,7 @@ heat_template_version: 2014-10-16
 
 description: Deploy an instance running Hero client
 
+
 parameters:
   key_name:
     type: string
@@ -69,9 +70,11 @@ resources:
             apt-get install -y git zip curl wget httpie
 
             # install python packages
-            apt-get install -y python python-dev python-pip python-setuptools
+            apt-get install -y python python-dev python-setuptools
 
             easy_install pip
+            
+            pip install python-glanceclient==2.5.0
 
             # pull Hero from github
             cd ~
@@ -97,6 +100,7 @@ resources:
             apt-get update
             apt-get install -y git zip curl wget httpie
             apt-get install -y sysv-rc-conf
+            apt-get install -y nginx
 
             {
               echo "#!/bin/bash"
