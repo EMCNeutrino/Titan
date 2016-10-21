@@ -22,7 +22,7 @@ NEUTRINO_HEROS_LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename' : 'ecs-install-multinode.log'
+            'filename' : 'VXRack-Neutrino-Heros-Client.log'
         }
     },
     'loggers': {
