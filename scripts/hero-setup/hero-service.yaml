@@ -49,6 +49,10 @@ parameters:
     type: string
     description: VxRack Neutrino admin password
 
+  engine_admin_token:
+    type: string
+    description: Hero engine admin token
+
 resources:
 
   mysql_node:
@@ -86,6 +90,7 @@ resources:
           net_id: { get_param: net_id }
           public_network: { get_param: public_network }
           security_group: { get_param: security_group }
+          engine_admin_token: { get_param: engine_admin_token }
           mysql_ip: { get_attr: [mysql_node, ip] }
           name:
             str_replace:
@@ -113,6 +118,7 @@ resources:
           public_network: { get_param: public_network }
           security_group: { get_param: security_group }
           engine_ip: { get_attr: [engine_node, ip] }
+          engine_admin_token: { get_param: engine_admin_token }
           name:
             str_replace:
               template:

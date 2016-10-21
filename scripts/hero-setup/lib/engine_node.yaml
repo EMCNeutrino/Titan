@@ -38,6 +38,9 @@ parameters:
     type: comma_delimited_list
     label: mysql_ip
     description: Comma separated list of ip.
+  engine_admin_token:
+    type: string 
+    description: Hero engine admin token
 
 resources:
 #  wait_condition:
@@ -68,15 +71,18 @@ resources:
         str_replace:
           params:
             __fip__: { get_attr: [floating_ip, floating_ip_address] }
+            __admin_token__: { get_param: engine_admin_token }
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
             
+            ADMIN_TOKEN=__admin_token__
+
             # verify parameters passed from heat template
             echo "FIP=""__fip__" > /tmp/fip.txt
 
             mysql_ip=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json 2>/dev/null | python3 -c "import sys, json; print(json.load(sys.stdin)['meta']['mysql_ip'])")
-             output example ["10.30.20.80"]
+            # output example ["10.30.20.80"]
             MYSQL_IP=${mysql_ip//[\"\[\] ()]}
 
             echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" > /etc/apt/sources.list.d/docker.list
@@ -125,7 +131,6 @@ resources:
 
             # start game engine
             sed -i -e 's|8080|80|' api.go
-            export ADMIN_TOKEN=1234
             export DATABASE_URL='titanuser:Neutrin0R0cks!@tcp('${MYSQL_IP}':3306)/titandb'
             
             {
@@ -143,7 +148,7 @@ resources:
             DOCKER_SCRIPT=~/start-engine-docker.sh
             {
                 echo "export DATABASE_URL='"${DATABASE_URL}"'"
-                echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -e ADMIN_TOKEN=Danger0us123 -p 0.0.0.0:80:8080 emccorp/hero-engine"
+                echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -e ADMIN_TOKEN=${ADMIN_TOKEN} -p 0.0.0.0:80:8080 emccorp/hero-engine"
             } > $DOCKER_SCRIPT
             chmod +x $DOCKER_SCRIPT
 
