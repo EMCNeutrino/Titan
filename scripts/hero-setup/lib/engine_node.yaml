@@ -137,7 +137,7 @@ resources:
             DOCKER_SCRIPT=~/start-engine-docker.sh
             {
                 echo "export DATABASE_URL='"${DATABASE_URL}"'"
-                echo "docker run -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -p 0.0.0.0:80:8080 emccorp/hero-engine"
+                echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -p 0.0.0.0:80:8080 emccorp/hero-engine"
             } > $DOCKER_SCRIPT
             chmod +x $DOCKER_SCRIPT
 
