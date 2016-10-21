@@ -11,4 +11,4 @@ export HERO_TWITTER="Gandalf"
 
 # ----------------------------------------
 export HERO_ENGINE_IP=10.246.152.15
-/home/ubuntu/Hero/script/register-hero.sh
+/home/ubuntu/Hero/scripts/register-hero.sh
