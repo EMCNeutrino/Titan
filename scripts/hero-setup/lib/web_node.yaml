@@ -33,6 +33,14 @@ parameters:
   neutrino_vip:
     type: string 
     description: VxRack Neutrino Virtual IP
+  admin_password:
+    type: string 
+    description: VxRack Neutrino admin password
+  engine_ip:
+    type: comma_delimited_list
+    label: engine_ip
+    description: Comma separated list of ip.
+
 
 resources:
 #  wait_condition:
@@ -56,6 +64,8 @@ resources:
       networks:
         - port: { get_resource: port }
       flavor: { get_param: flavor }
+      metadata:
+        engine_ip: { get_param: engine_ip }
       user_data_format: RAW
       user_data:
         str_replace:
@@ -63,6 +73,7 @@ resources:
             __private_key__: { get_param: private_key }
             __fip__: { get_attr: [floating_ip, floating_ip_address] }
             __neutrino_vip__: { get_param: neutrino_vip }
+            __admin_password__: { get_param: admin_password }
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
@@ -70,7 +81,14 @@ resources:
             # verify parameters passed from heat template
             echo "export FIP=""__fip__" > /tmp/fip.txt
             NEUTRINO_VIP=__neutrino_vip__
-            
+            ADMIN_PASSWORD=__admin_password__
+
+            engine_ip=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json 2>/dev/null | python3 -c "import sys, json; print(json.load(sys.stdin)['meta']['engine_ip'])")
+             output example ["10.30.20.80"]
+            ENGINE_IP=${engine_ip//[\"\[\] ()]}
+            HERO_API=http://${ENGINE_IP}
+            HERO_ADMIN_TOKEN=1234
+
             # to install docker
             echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" > /etc/apt/sources.list.d/docker.list
 
@@ -101,10 +119,13 @@ resources:
               echo ""
               echo "HOST=${NEUTRINO_VIP}"
               echo "ADMIN_NAME=admin"
-              echo "PASSWORD=admin123"
+              echo "PASSWORD=${ADMIN_PASSWORD}"
               echo "ADMIN_DOMAIN_NAME=default"
               echo "ADMIN_DOMAIN_ID=default"
               echo "ADMIN_PROJECT_NAME=admin"
+              echo ""
+              echo "HERO_API=${HERO_API}"
+              echo "HERO_ADMIN_TOKEN=${HERO_ADMIN_TOKEN}"
               echo ""
               echo "METADATA_ITEMS=1"
               echo "INJECTED_FILE_CONTENT_BYTES=1"
@@ -134,10 +155,10 @@ resources:
             apt-get install -y --allow-unauthenticated docker-engine
 
             # start rabbitmq container
-            docker run -d --name rabbitmq rabbitmq
+            docker run --restart=always -d --name rabbitmq rabbitmq
 
             # start hero-web container
-            docker run -d --name hero-web --env-file ~/hero.env --link rabbitmq:rabbitmq -p 80:8080 emccorp/hero-web
+            docker run --restart=always -d --name hero-web --env-file ~/hero.env --link rabbitmq:rabbitmq -p 80:8080 emccorp/hero-web
 
             # Notify Heat we're done
 #            wc_notify --data-binary '{"status": "SUCCESS"}'
