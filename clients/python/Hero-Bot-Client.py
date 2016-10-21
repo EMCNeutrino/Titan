@@ -1,29 +1,12 @@
 # !/bin/python
 # Hero Bot Client: Register Hero with Game-controller
 
-import argparse
-import getopt
 import json
 import random
-import subprocess
-from subprocess import PIPE, Popen
-import logging
 import logging.config
-import sys
-import socket
 import os
-import time
-
 import requests
-
 import settings
-import fcntl
-import struct
-import re
-import StringIO
-import mysql.connector
-import datetime
-import sqlalchemy
 import uuid
 
 
