@@ -17,14 +17,9 @@ logger = logging.getLogger("root")
 
 #SYSTEM Variables
 hero_engine_ip = os.environ['HERO_ENGINE_IP']
-hero_first_name = os.environ['HERO_FIRST_NAME']
-hero_last_name = os.environ['HERO_LAST_NAME']
-hero_name = os.environ['HERO_NAME']
-hero_email = os.environ['HERO_EMAIL']
-
-hero_class = 'chief'
-auth_token = '1234'
+auth_token = os.environ['HERO_ADMIN_TOKEN']
 headers = {'X-Auth-Token': auth_token}
+
 # URL of the engine API
 engine_url = 'http://' + hero_engine_ip + '/hero'
 print('Engine API URL: ' + engine_url)
@@ -270,7 +265,7 @@ def Get_hero(heros):
 
     return heros[selected]
 
-def register_hero(player_first_name, player_last_name, hero_name, hero_email):
+def register_hero(player_first_name, player_last_name, hero_name, hero_email, hero_class):
     """
     Register a hero
     :param player_first_name:The Hero's first name
@@ -280,23 +275,24 @@ def register_hero(player_first_name, player_last_name, hero_name, hero_email):
     :return:The Hero authentication Token
     """
 
-    logger.info("Player: {0} {1} | Hero: {2} | Email: {3}".format(player_first_name, player_last_name, hero_name, hero_email))
+    logger.info("Player: {0} {1} | Hero: {2} | Email: {3}".format(player_first_name, player_last_name, hero_name, hero_email, hero_class))
 
     # POST with parameters
-    response = requests.post(engine_url, headers={'X-Auth-Token': auth_token},
-                             params={'firstName': player_first_name, 'lastName': player_last_name, 'heroName': hero_name,
-                                     'heroClass': hero_class, 'email': hero_email})
+    data = {'firstName': player_first_name, 'lastName': player_last_name, 'email': hero_email,
+            'heroName': hero_name,'heroClass': hero_class }
+    response = requests.post(engine_url, headers={'X-Auth-Token': auth_token}, data = json.dumps(data))
 
-    team_auth = json.dumps(response.text)
+    result = json.loads(response.text)
+    token = result['token']
 
     if response.status_code == 200:
         print ('Hero: \'' + hero_name + '\' joined the game!')
-        print (hero_name + ' authentication Code: ' + team_auth)
+        print (hero_name + ' authentication Code: ' + token)
     else:
         print ('Hero: \'' + hero_name + '\' joining game Failed!')
         print ("HTTP Code: " + str(response.status_code) + " | Response: " + response.text)
 
-    return team_auth
+    return token
 
 
 def activate_hero(hero_name, token):
@@ -306,7 +302,8 @@ def activate_hero(hero_name, token):
     :param token:The Hero's authentication token
     """
     url = engine_url + '/' + hero_name + '/activate'
-    response = requests.post(url, headers={'X-Auth-Token': token})
+    print url
+    response = requests.get(url, headers={'X-Auth-Token': token})
 
     if response.status_code == 200:
 
@@ -376,17 +373,20 @@ def main():
 
     logger.info("Heros created: {0}".format(len(heros)))
 
-    selected = random.randint(1, len(heros))
-    myhero = heros[selected]
+    #selected = random.randint(1, len(heros))
+    for x in range(0, len(heros)):
+        myhero = heros[x]
 
-    logger.info("Heros selectedd: {0}".format(myhero))
+        logger.info("Heros selectedd: {0}".format(myhero))
 
-    # register a Hero
-    token = register_hero(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email)
+        try:  
+            # register a Hero
+            token = register_hero(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email, myhero.hclass)
 
-    # activate a Hero
-    activate_hero(myhero.hero_name, token)
-
+            # activate a Hero
+            activate_hero(myhero.hero_name, token)
+        except Exception as err: 
+            logger.error("error: {0}".format(err))
 
 
 
