@@ -1,14 +1,11 @@
 #!/bin/bash
+set -x
 
-export HERO_FIRST_NAME=Gandalf
-export HERO_LAST_NAME=TheGray
-export HERO_NAME=Magician
-export HERO_EMAIL="gandalf_thegray@example.com"
-# authentication token you received after registration
-export HERO_TOKEN=1234
-# optional Twitter account
-export HERO_TWITTER="Gandalf"
+# Activate hero
 
-# ----------------------------------------
-export HERO_ENGINE_IP=10.246.152.15
-/home/ubuntu/Hero/scripts/register-hero.sh
+export HERO_PORTAL_IP=10.246.152.15
+export HERO_NAME=larry
+# Hero token you received after registration
+export HERO_TOKEN=48fdafd90a385c7e
+
+curl -s -H "X-Auth-Token: ${HERO_TOKEN}" http://${HERO_PORTAL_IP}/hero/${HERO_NAME}
