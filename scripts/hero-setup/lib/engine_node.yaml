@@ -97,6 +97,10 @@ resources:
             # update
             apt-get update
 
+            # use nginx to front hero web
+            apt-get install -y nginx
+            service nginx stop
+
             # install tools
             # apt-get install -y git zip curl wget
 
@@ -149,7 +153,7 @@ resources:
             {
                 echo "export DATABASE_URL='"${DATABASE_URL}"'"
                 echo "export ADMIN_TOKEN='"${ADMIN_TOKEN}"'"
-                echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -e ADMIN_TOKEN=\${ADMIN_TOKEN} -p 0.0.0.0:80:8080 emccorp/hero-engine"
+                echo "docker run --restart=always -d --name hero-engine -e DATABASE_URL=\${DATABASE_URL} -e ADMIN_TOKEN=\${ADMIN_TOKEN} -p 127.0.0.1:8080:8080 emccorp/hero-engine"
             } > $DOCKER_SCRIPT
             chmod +x $DOCKER_SCRIPT
 
@@ -168,6 +172,23 @@ resources:
                fi
                COUNT=`expr $COUNT + 1`
             done
+
+            cat >> /etc/nginx/conf.d/hero-engine.conf << EOF
+            upstream backend {
+            #   ip_hash;
+              server 127.0.0.1:8080;
+            }
+
+            server {
+              listen 80;
+
+              location / {
+                proxy_pass http://backend;
+              }
+            }
+            EOF
+            rm /etc/nginx/sites-enabled/default
+            service nginx start
 
 
             $DOCKER_SCRIPT
