@@ -176,8 +176,11 @@ resources:
             service nginx stop
             cat >> /etc/nginx/conf.d/hero-web.conf << EOF
             upstream backend {
-            #   ip_hash;
               server 127.0.0.1:8080;
+            }
+ 
+            upstream engine {
+              server ${ENGINE_IP};
             }
 
             server {
@@ -185,6 +188,10 @@ resources:
 
               location / {
                 proxy_pass http://backend;
+              }
+
+              location /hero {
+                proxy_pass http://engine;
               }
             }
             EOF
