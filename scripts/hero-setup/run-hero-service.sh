@@ -22,5 +22,6 @@ heat --insecure stack-${ACTION} -f hero-service.yaml \
      -P "security_group=$HEAT_SECGROUP_ID" \
      -P "neutrino_vip=$NEUTRINO_VIP" \
      -P "admin_password=$ADMIN_PASSWORD" \
+     -P "engine_admin_token=$ENGINE_ADMIN_TOKEN" \
      ${HEAT_PREFIX}-services
 set +x

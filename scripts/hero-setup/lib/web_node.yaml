@@ -36,6 +36,9 @@ parameters:
   admin_password:
     type: string 
     description: VxRack Neutrino admin password
+  engine_admin_token:
+    type: string 
+    description: Hero engine admin token
   engine_ip:
     type: comma_delimited_list
     label: engine_ip
@@ -74,9 +77,11 @@ resources:
             __fip__: { get_attr: [floating_ip, floating_ip_address] }
             __neutrino_vip__: { get_param: neutrino_vip }
             __admin_password__: { get_param: admin_password }
+            __engine_admin_token__: { get_param: engine_admin_token }
 #            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
+            set -x
             
             ip=`ifconfig ens3 | awk '/inet addr/{print substr($2,6)}'`
 
@@ -89,12 +94,12 @@ resources:
             echo "export FIP=""__fip__" > /tmp/fip.txt
             NEUTRINO_VIP=__neutrino_vip__
             ADMIN_PASSWORD=__admin_password__
+            HERO_ADMIN_TOKEN=__engine_admin_token__
 
             engine_ip=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json 2>/dev/null | python3 -c "import sys, json; print(json.load(sys.stdin)['meta']['engine_ip'])")
              output example ["10.30.20.80"]
             ENGINE_IP=${engine_ip//[\"\[\] ()]}
             HERO_API=http://${ENGINE_IP}
-            HERO_ADMIN_TOKEN=1234
 
             # to install docker
             echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" > /etc/apt/sources.list.d/docker.list
@@ -103,8 +108,6 @@ resources:
             apt-get update
 
 
-            # install tools
-            #apt-get install -y git zip curl wget
 
             # install python packages
             #apt-get install -y python3 python3-dev python3-pip python3-setuptools
@@ -165,7 +168,35 @@ resources:
             docker run --restart=always -d --name rabbitmq rabbitmq
 
             # start hero-web container
-            docker run --restart=always -d --name hero-web --env-file ~/hero.env --link rabbitmq:rabbitmq -p 80:8080 emccorp/hero-web
+            docker run --restart=always -d --name hero-web --env-file ~/hero.env --link rabbitmq:rabbitmq -p 127.0.0.1:8080:8080 emccorp/hero-web
+
+            # use nginx to front hero web
+            apt-get install -y nginx
+
+            service nginx stop
+            cat >> /etc/nginx/conf.d/hero-web.conf << EOF
+            upstream backend {
+              server 127.0.0.1:8080;
+            }
+ 
+            upstream engine {
+              server ${ENGINE_IP};
+            }
+
+            server {
+              listen 80;
+
+              location / {
+                proxy_pass http://backend;
+              }
+
+              location /hero {
+                proxy_pass http://engine;
+              }
+            }
+            EOF
+            rm /etc/nginx/sites-enabled/default
+            service nginx start
 
             # Notify Heat we're done
 #            wc_notify --data-binary '{"status": "SUCCESS"}'
