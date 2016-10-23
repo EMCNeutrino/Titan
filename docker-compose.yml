@@ -8,6 +8,11 @@ services:
     links:
       - db
     command: ./wait-for-it.sh -t 60 db:3306 -- app
+    labels:
+      - "traefik.backend=heroengine"
+      - "traefik.frontend.rule=Host:localhost;Path:/hero"
+      - "traefik.port=8080"
+      - "traefik.priority=100"
   web:
     image: "emccorp/hero-web:latest"
     environment:
