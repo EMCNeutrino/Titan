@@ -17,6 +17,7 @@ services:
       - MAILGUN_API_KEY=key-1234...
       - MAILGUN_SENDER_DOMAIN=example.com
       - DEFAULT_FROM_EMAIL=info@example.com
+      - NEUTRINO_URL=http://neutrino.com
     links:
       - db
       - engine
