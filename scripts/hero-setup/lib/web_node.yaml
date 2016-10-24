@@ -182,6 +182,22 @@ resources:
             # start rabbitmq container
             # docker run --restart=always -d --name rabbitmq rabbitmq
 
+            LIMIT=30
+            COUNT=0
+ 
+            while [ "$COUNT" -le "$LIMIT" ]
+            do
+               echo "`date`: wait for mysql server to start"
+               nc -zv ${MYSQL_IP} 3306
+               if [ $? -ne 0 ]
+               then
+                  sleep 10
+               else
+                  break
+               fi
+               COUNT=`expr $COUNT + 1`
+            done
+
             # start hero-web container
             docker run --restart=always -d --name hero-web --env-file ~/hero.env -p 127.0.0.1:8080:8080 emccorp/hero-web
 
