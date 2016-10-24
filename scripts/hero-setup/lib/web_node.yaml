@@ -43,6 +43,11 @@ parameters:
     type: comma_delimited_list
     label: engine_ip
     description: Comma separated list of ip.
+  mysql_ip:
+    type: comma_delimited_list
+    label: mysql_ip
+    description: Comma separated list of ip.
+
 
 
 resources:
@@ -69,6 +74,7 @@ resources:
       flavor: { get_param: flavor }
       metadata:
         engine_ip: { get_param: engine_ip }
+        mysql_ip: { get_param: mysql_ip }
       user_data_format: RAW
       user_data:
         str_replace:
@@ -89,6 +95,11 @@ resources:
             $ip `hostname`
             EOF
 
+            mysql_ip=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json 2>/dev/null | python3 -c "import sys, json; print(json.load(sys.stdin)['meta']['mysql_ip'])")
+            # output example ["10.30.20.80"]
+            MYSQL_IP=${mysql_ip//[\"\[\] ()]}
+
+            echo "$MYSQL_IP final"
 
             # verify parameters passed from heat template
             echo "export FIP=""__fip__" > /tmp/fip.txt
@@ -119,6 +130,8 @@ resources:
             #git config --global url."https://".insteadOf git:// 
             #git clone https://github.com/VxRackNeutrino/Hero
             
+            export DATABASE_URL='mysql://titanuser:Neutrin0R0cks!@'${MYSQL_IP}':3306/titandb'
+
             # produce hero env file
             {
               echo "RABBITMQ_HOST=rabbitmq"
@@ -127,6 +140,8 @@ resources:
               echo "RABBITMQ_PASSWORD=guest"
               echo "QUEUE_NAME=hero"
               echo ""
+              echo "DATABASE_URL=${DATABASE_URL}"
+              echo "NEUTRINO_URL=https://${NEUTRINO_VIP}"
               echo "HOST=${NEUTRINO_VIP}"
               echo "ADMIN_NAME=admin"
               echo "PASSWORD=${ADMIN_PASSWORD}"
@@ -155,9 +170,9 @@ resources:
               echo "GIGABYTES=5"
               echo "SNAPSHOTS=1"
               echo ""
-              echo "MAILGUN_KEY=key-17a26be52da6de54e5987e665550111d"
-              echo "MAILGUN_BOX=https://api.mailgun.net/v3/vxrackneutrinoheros.com/messages"
-              echo "MAILGUN_SENDER=info@vxrackneutrinoheros.com"
+              echo "MAILGUN_API_KEY=key-17a26be52da6de54e5987e665550111d"
+              echo "MAILGUN_FROM_EMAIL=info@vxrackneutrinoheroes.com"
+              echo "MAILGUN_SENDER_DOMAIN=vxrackneutrinoheroes.com"
             } > ~/hero.env
 
 
@@ -165,10 +180,10 @@ resources:
             apt-get install -y --allow-unauthenticated docker-engine
 
             # start rabbitmq container
-            docker run --restart=always -d --name rabbitmq rabbitmq
+            # docker run --restart=always -d --name rabbitmq rabbitmq
 
             # start hero-web container
-            docker run --restart=always -d --name hero-web --env-file ~/hero.env --link rabbitmq:rabbitmq -p 127.0.0.1:8080:8080 emccorp/hero-web
+            docker run --restart=always -d --name hero-web --env-file ~/hero.env -p 127.0.0.1:8080:8080 emccorp/hero-web
 
             # use nginx to front hero web
             apt-get install -y nginx
