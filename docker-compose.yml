@@ -35,7 +35,8 @@ services:
     image: "emccorp/hero-db"
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - /data:/data/mysql
+    volumes:
+      - /data/mysql:/var/lib/mysql
   traefik:
     image: "traefik:v1.1.0-rc2"
     ports:

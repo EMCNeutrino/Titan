@@ -118,6 +118,7 @@ resources:
           public_network: { get_param: public_network }
           security_group: { get_param: security_group }
           engine_ip: { get_attr: [engine_node, ip] }
+          mysql_ip: { get_attr: [mysql_node, ip] }
           engine_admin_token: { get_param: engine_admin_token }
           name:
             str_replace:
