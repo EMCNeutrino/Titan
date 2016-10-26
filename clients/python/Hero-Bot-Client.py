@@ -6,7 +6,7 @@ import logging.config
 import os
 import random
 import uuid
-
+import sys
 import requests
 
 import settings
@@ -16,12 +16,12 @@ logging.config.dictConfig(settings.NEUTRINO_HEROS_LOGGING)
 logger = logging.getLogger("root")
 
 #SYSTEM Variables
-hero_engine_ip = os.environ['HERO_ENGINE_IP']
+hero_engine_ip = os.environ['HERO_API']
 auth_token = os.environ['HERO_ADMIN_TOKEN']
 headers = {'X-Auth-Token': auth_token}
 
 # URL of the engine API
-engine_url = 'http://' + hero_engine_ip + '/hero'
+engine_url = hero_engine_ip + '/hero'
 print('Engine API URL: ' + engine_url)
 
 #Array of Heros
@@ -356,36 +356,24 @@ class hero:
 
 
 def main():
-    #parser = argparse.ArgumentParser(
-    #    description='IP address of the the Game Controller.')
-    #parser.add_argument('--ip', nargs='+', help='The IP of the Game Controller. Example: 10.1.0.4',
-    #                    required=True)
-    #args = parser.parse_args()
-    #
-    #UserName
-    #UserLastName
-    #HeroName
-    #Email
-    #Token
 
-
-    Load_Heros(100)
+    heroesCount = int(sys.argv[1])
+    Load_Heros(heroesCount)
 
     logger.info("Heros created: {0}".format(len(heros)))
 
     #selected = random.randint(1, len(heros))
-    for x in range(0, len(heros)):
-        myhero = heros[x]
+    for myhero in heros:
 
         logger.info("Heros selectedd: {0}".format(myhero))
 
-        try:  
+        try:
             # register a Hero
             token = register_hero(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email, myhero.hclass)
 
             # activate a Hero
             activate_hero(myhero.hero_name, token)
-        except Exception as err: 
+        except Exception as err:
             logger.error("error: {0}".format(err))
 
 
