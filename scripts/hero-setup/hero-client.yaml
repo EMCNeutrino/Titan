@@ -1,0 +1,84 @@
+heat_template_version: 2015-10-15
+
+description: > 
+  This template creates Hero VMs
+
+parameters:
+  count:
+    description: Number of VMs
+    type: number
+    default: 1
+
+  name:
+    type: string
+    description: Name of VM prefix
+
+  flavor:
+    type: string
+    description: name of the flavor
+
+  client_flavor:
+    type: string
+    description: name of the flavor
+    default: m1.tiny
+
+  public_network:
+    type: string
+    description: public network name or id
+
+  image:
+    type: string
+    description: image name or id
+
+  image_trusty:
+    type: string
+    description: image name or id
+
+  key_name:
+    type: string
+    description: Name of key-pair to be used
+
+  net_id:
+    type: string
+    description: Name or ID of private network
+
+  security_group:
+    type: string
+    description: Name or ID of security group
+
+  neutrino_vip:
+    type: string
+    description: VxRack Neutrino Virtual IP
+
+  hero_api:
+    type: string
+    description: Hero engine api
+
+  hero_token:
+    type: string
+    description: Hero engine token
+
+resources:
+
+  client_node:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: count}
+      resource_def:
+        type: Lib::MSG::ClientNode
+        properties:
+          image: { get_param: image }
+          flavor: {get_param: client_flavor }
+          key_name: {get_param: key_name}
+          net_id: { get_param: net_id }
+          public_network: { get_param: public_network }
+          security_group: { get_param: security_group }
+          hero_api: { get_param: hero_api }
+          hero_token: { get_param: hero_token }
+          name:
+            str_replace:
+              template:
+                $name-$index
+              params:
+                $name: { get_param: name }
+                $index: "%index%"
