@@ -215,7 +215,7 @@ def Load_Heros(heros_number):
     for i in range(0, heros_number):
 
         myhero = hero()
-        myhero.hero_name = get_hero_name()
+        myhero.hero_name = get_hero_name() + "_Bot_{0}".format(random.randint(1,1000000000))
         #Load the Hero information
         myhero.player_name = get_hero_name()
         myhero.player_lastname = "Bot-O-Matic"
