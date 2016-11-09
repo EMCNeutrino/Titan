@@ -215,7 +215,7 @@ def Load_Heros(heros_number):
     for i in range(0, heros_number):
 
         myhero = hero()
-        myhero.hero_name = get_hero_name()
+        myhero.hero_name = get_hero_name() + "_Bot_{0}".format(random.randint(1,1000000000))
         #Load the Hero information
         myhero.player_name = get_hero_name()
         myhero.player_lastname = "Bot-O-Matic"
@@ -282,17 +282,16 @@ def register_hero(player_first_name, player_last_name, hero_name, hero_email, he
             'heroName': hero_name,'heroClass': hero_class }
     response = requests.post(engine_url, headers={'X-Auth-Token': auth_token}, data = json.dumps(data))
 
-    result = json.loads(response.text)
-    token = result['token']
 
     if response.status_code == 200:
+        result = json.loads(response.text)
+        token = result['token']
         print ('Hero: \'' + hero_name + '\' joined the game!')
         print (hero_name + ' authentication Code: ' + token)
+        return token
     else:
         print ('Hero: \'' + hero_name + '\' joining game Failed!')
         print ("HTTP Code: " + str(response.status_code) + " | Response: " + response.text)
-
-    return token
 
 
 def activate_hero(hero_name, token):
@@ -365,14 +364,16 @@ def main():
     #selected = random.randint(1, len(heros))
     for myhero in heros:
 
-        logger.info("Heros selectedd: {0}".format(myhero))
+        logger.info("Heros selected: {0}, {1}, {2}, {3}, {4}".format(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email, myhero.hclass))
 
         try:
             # register a Hero
             token = register_hero(myhero.player_name, myhero.player_lastname, myhero.hero_name, myhero.email, myhero.hclass)
 
             # activate a Hero
-            activate_hero(myhero.hero_name, token)
+            if token is not None:
+                logger.info("Activate hero : {0}".format(myhero.hero_name))
+                activate_hero(myhero.hero_name, token)
         except Exception as err:
             logger.error("error: {0}".format(err))
 
