@@ -95,3 +95,6 @@ db.sqlite3
 
 # Cloud Foundry CLI
 cf
+
+# Golang Delve debugger
+debug

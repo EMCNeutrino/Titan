@@ -1,0 +1,53 @@
+version: '2'
+services:
+  engine:
+    image: "emccorp/hero-engine"
+    environment:
+      - DATABASE_URL=titanuser:Neutrin0R0cks!@tcp(db:3306)/titandb
+      - ADMIN_TOKEN=1234
+    links:
+      - db
+    command: ./wait-for-it.sh -t 60 db:3306 -- app
+    labels:
+      - "traefik.backend=heroengine"
+      - "traefik.frontend.rule=Host:localhost;Path:/hero"
+      - "traefik.port=8080"
+      - "traefik.priority=100"
+  web:
+    image: "emccorp/hero-web:latest"
+    environment:
+      - DATABASE_URL=mysql://titanuser:Neutrin0R0cks!@db:3306/titandb
+      - HERO_API=http://engine:8080
+      - HERO_ADMIN_TOKEN=1234
+      - MAILGUN_API_KEY=key-1234...
+      - MAILGUN_SENDER_DOMAIN=example.com
+      - DEFAULT_FROM_EMAIL=info@example.com
+      - NEUTRINO_URL=http://neutrino.com
+    links:
+      - db
+      - engine
+    labels:
+      - "traefik.backend=heroweb"
+      - "traefik.frontend.rule=Host:localhost"
+      - "traefik.port=8080"
+    command: ./wait-for-it.sh -t 60 db:3306 -- ./start.sh
+  db:
+    image: "emccorp/hero-db"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - /data/mysql:/var/lib/mysql
+  traefik:
+    image: "traefik:v1.1.0-rc2"
+    ports:
+      - "8080:8080"
+      - "80:80"
+    command: traefik -l DEBUG -c /dev/null --docker --docker.watch --web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - web
+  watchtower:
+    image: "centurylink/watchtower"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

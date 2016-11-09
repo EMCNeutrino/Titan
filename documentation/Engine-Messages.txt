@@ -1,0 +1,40 @@
+Level UP Message
+
+	<@IdleBot> Thorwald, the Thief of Sorts, has attained level 28! Next level in 0 days, 10:38:00.
+	-IdleBot- You found a level 26 helm. Your current helm is level 33, so it seems Luck is against you. You toss the helm.
+
+	<@IdleBot> Thorwald, the Thief of Sorts, has attained level 30! Next level in 0 days, 14:18:29.
+	-IdleBot- You found a level 31 charm! Your current charm is only level 20, so it seems Luck is with you!
+
+Combat Messages
+
+	<@IdleBot> Thorwald [9/198] has challenged cirdan [303/753] in combat and lost! 0 days, 01:03:48 is added to Thorwald's clock.
+	<@IdleBot> Thorwald reaches next level in 0 days, 11:41:48.
+
+	<@IdleBot> Thorwald [105/215] has challenged zid [263/846] in combat and lost! 0 days, 01:25:50 is added to Thorwald's clock.
+	<@IdleBot> Thorwald reaches next level in 0 days, 15:44:19.
+
+
+Group Combat Messages
+
+	<@IdleBot> spillere, IndigoTiger, and darkmage [1930/1942] have team battled Regnor, fangfufu, and Fluttershy [1216/2570] and won! 1 day, 02:17:10 is removed from their clocks.
+
+
+GoodSend Message
+
+	@IdleBot> Jim got a kiss from drwiii! This wondrous godsend has accelerated them 1 day, 07:33:18 towards level 52.
+	<@IdleBot> Jim reaches next level in 9 days, 15:24:13.
+
+	<@IdleBot> Verily I say unto thee, the Heavens have burst forth, and the blessed hand of God carried jhack 0 days, 05:31:31 toward level 38.
+
+
+Calamity Message
+
+	<@IdleBot> jhack reaches next level in 0 days, 17:29:52.
+	<@IdleBot> lipek's shield was damaged by a dragon's fiery breath! lipek's shield loses 10% of its effectiveness.
+
+	<@IdleBot> borsin fell into a hole. This terrible calamity has slowed them 0 days, 00:19:46 from level 30.
+	<@IdleBot> borsin reaches next level in 0 days, 04:26:57.
+
+	<@IdleBot> BURUT was decapitated, temporarily... This terrible calamity has slowed them 0 days, 00:43:13 from level 62.
+	<@IdleBot> BURUT reaches next level in 0 days, 08:43:29.

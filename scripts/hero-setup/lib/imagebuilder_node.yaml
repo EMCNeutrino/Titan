@@ -1,0 +1,159 @@
+heat_template_version: 2014-10-16
+
+description: Deploy an instance running Hero client
+
+
+parameters:
+  key_name:
+    type: string
+    description: Name of key-pair to be used for the default user
+  flavor:
+    type: string
+    description: |
+      Choose an instance flavor
+  image:
+    type: string
+    label: Server image
+  net_id:
+    type: string
+    label: Network ID
+    description: ID of the network to use
+  name:
+    type: string
+    description: Name of instance
+  public_network:
+    type: string
+    description: Public network id
+  private_key:
+    type: string
+    description: Name of private key to be used for the local Cassandra user
+    default: my_key
+  security_group:
+    type: string 
+    description: Nmae or ID of security group
+
+resources:
+#  wait_condition:
+#    type: OS::Heat::WaitCondition
+#    properties:
+#      handle: { get_resource: wait_handle }
+#      count: 1
+#      timeout: 600
+ 
+#  wait_handle:
+#    type: OS::Heat::WaitConditionHandle
+
+
+  instance:
+    type: OS::Nova::Server
+    properties:
+      key_name: { get_param: key_name }
+      name: 
+        list_join: ["-", [{get_param: name }, "imagebuilder"]]
+      image: { get_param: image }
+      networks:
+        - port: { get_resource: port }
+      flavor: { get_param: flavor }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            __private_key__: { get_param: private_key }
+#            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
+          template: |
+            #!/bin/bash
+            
+            # update
+            apt-get update
+
+            # install tools
+            apt-get install -y git zip curl wget httpie
+
+            # install python packages
+            apt-get install -y python python-dev python-setuptools
+
+            easy_install pip
+            
+            pip install python-glanceclient==2.5.0
+
+            # pull Hero from github
+            cd ~
+            
+            git config --global http.sslVerify false
+            git config --global url."https://".insteadOf git:// 
+            git clone -b develop --recursive https://github.com/VxRackNeutrino/Hero
+
+            # image builder
+            export IMAGEBUILDER_DIR=~/imagebuilder
+            mkdir -p $IMAGEBUILDER_DIR
+            cd $IMAGEBUILDER_DIR
+            git clone https://github.com/openstack/diskimage-builder
+            pip install pytz
+            pip install diskimage-builder
+            apt-get install -y qemu-utils debootstrap
+
+            cd $IMAGEBUILDER_DIR/diskimage-builder/elements
+            cp -rp ubuntu ubuntu-hero
+            cat >> ubuntu-hero/pre-install.d/02-hero << EOF
+            #!/bin/bash
+
+            apt-get update
+            apt-get install -y git zip curl wget httpie
+            apt-get install -y sysv-rc-conf
+            apt-get install -y nginx
+
+            {
+              echo "#!/bin/bash"
+              echo ""
+              echo "su - ubuntu << EOF"
+              echo "cd /home/ubuntu"
+              echo "git config --global http.sslVerify false"
+              echo "git config --global url."https://".insteadOf git://"
+              echo "git clone -b develop --recursive https://github.com/VxRackNeutrino/Hero.git"
+              echo "EOF"
+            } > /etc/init.d/hero-init
+            chmod 755 /etc/init.d/hero-init
+            sysv-rc-conf hero-init on
+
+            EOF
+
+            chmod 755 $IMAGEBUILDER_DIR/diskimage-builder/elements/ubuntu-hero/pre-install.d/02-hero
+
+            cd $IMAGEBUILDER_DIR/
+            cat >> hero-ubuntu.sh << EOF
+            #!/bin/bash
+            export ELEMENTS_PATH=$IMAGEBUILDER_DIR/diskimage-builder/elements
+            set -ux
+            DIB_RELEASE=trusty disk-image-create -a amd64 vm ubuntu-hero -o hero-ubuntu.qcow2
+            EOF
+ 
+            chmod +x hero-ubuntu.sh 
+
+            # Notify Heat we're done
+#            wc_notify --data-binary '{"status": "SUCCESS"}'
+    
+  port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: net_id }
+      security_groups:
+        - { get_param: security_group }
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+
+  floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: { get_resource: port }
+
+outputs:
+#  fip:
+#    description: floating ip of the instance
+#    value: { get_attr: [floating_ip, floating_ip_address] }
+  ip:
+    description: The IP address of the instance.
+    value: { get_attr: [instance, first_address] }

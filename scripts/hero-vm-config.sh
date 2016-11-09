@@ -1,20 +1,11 @@
 #!/bin/bash
+set -x
 
-export GAME_CONTROLLER_IP=10.246.154.49
-export HERO_NAME=`hostname`
-export HERO_TITLE="Neutrino Guru"
+# Activate hero
 
-# should preinstall python and git to speed up boot process
-# install python setup tools
-apt-get install -y python-setuptools python-dev build-essential
+export HERO_PORTAL_IP=10.246.152.15
+export HERO_NAME=larry
+# Hero token you received after registration
+export HERO_TOKEN=48fdafd90a385c7e
 
-# install git
-apt-get install -y git
-
-git config --global http.sslVerify false
-
-cd /opt
-# clone Hero project as ubuntu user
-git clone https://github.com/VxRackNeutrino/Hero
-
-python /opt/Hero/scripts/hero-register-test.py
+curl -s -H "X-Auth-Token: ${HERO_TOKEN}" http://${HERO_PORTAL_IP}/hero/${HERO_NAME}/activate
